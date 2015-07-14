@@ -10,6 +10,7 @@ parser.add_argument("fasta_file", type=str)
 args = parser.parse_args()
 
 def print_nties(n):
+    """Print assembly stats"""
     print "%s value : %s %s %s size : %s" \
         %(n, cur, pad.rjust(wrap-len(cur)), n, "{:,}".format(sizes[j]))
 
