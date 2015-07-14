@@ -15,7 +15,7 @@ def print_nties(n):
         %(n, cur, pad.rjust(wrap-len(cur)), n, "{:,}".format(sizes[j]))
 
 def read_sizes_from_fasta_file(filename):
-    """Read FASTA sequence file return sort list and total lenght"""
+    """Read FASTA sequence file return sort list and total length"""
     f = open(filename, 'r')
     line = f.readline()
     sizes = []
