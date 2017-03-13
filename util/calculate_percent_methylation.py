@@ -18,6 +18,7 @@ Methyl_Data = namedtuple('Methyl_Data', 'chr, start, end, feature, score, '
 def load(intersect_file):
     pass
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Given an intersect bed output file, produce a summary of "
