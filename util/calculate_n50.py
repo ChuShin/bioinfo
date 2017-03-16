@@ -9,7 +9,7 @@ Produce the assembly statistics given a WGA FASTA file."""
 
 
 def read_sizes_from_fasta_file(filename, min_length):
-    """Read FASTA sequence file return sort list and total length"""
+    """Return sort sizes and total WGA length (>min_length) in FASTA file"""
     f = open(filename, 'r')
     line = f.readline()
     sizes = []
@@ -37,11 +37,10 @@ def read_sizes_from_fasta_file(filename, min_length):
     return sizes, sum_length
 
 
-def print_nties(n, cur, wrap, pad):
+def print_nties(nties, cur, size, wrap, pad):
     """Print assembly stats"""
-    print "%s value : %s %s %s size : %s" \
-        %(n, cur, pad.rjust(wrap-len(cur)), n, "{:,}".format(sizes[j]))
-
+    print "N%d value : %s %s %s size : %s" \
+        %(nties, cur, pad.rjust(wrap-len(cur)), nties, "{:,}".format(size))
 
 
 def print_summary(fasta_file,min_length):
@@ -49,7 +48,7 @@ def print_summary(fasta_file,min_length):
     num_seq = "{:,}".format(len(sizes))
     max_len = "{:,}".format(sizes[0])
     min_len = "{:,}".format(sizes[-1])
-    [count, f50, f60, f70, f80, f90] = [0, 0, 0, 0, 0, 0]
+    count = 0
     wrap = 10
     pad = ' '
 
@@ -62,22 +61,9 @@ def print_summary(fasta_file,min_length):
     for j in range(0, len(sizes)):
         count+=sizes[j]
         cur = "{:,}".format(j+1)
-        if count>=sum_length*0.5 and not(f50):
-            print_nties("N50", cur, wrap, pad)
-            f50 =1
-        if count>=sum_length*0.6 and not(f60):
-            print_nties("N60", cur, wrap, pad)
-            f60 =1
-        if count>=sum_length*0.7 and not(f70):
-            print_nties("N70", cur, wrap, pad)
-            f70 =1
-        if count>=sum_length*0.8 and not(f80):
-            print_nties("N80", cur, wrap, pad)
-            f80 =1
-        if count>=sum_length*0.9 and not(f90):
-            print_nties("N90", cur, wrap, pad)
-            f90 =1
-            break
+        for nties in range(50, 90, 10):
+            if count >= sum_length*nties/100:
+                print_nties(nties, cur, sizes[j], wrap, pad, )
 
 
 def main():
