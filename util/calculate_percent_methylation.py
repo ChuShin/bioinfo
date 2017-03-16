@@ -32,12 +32,9 @@ def calculate_percent_methylation(intersections, min_obs_nuc):
         for context in intersections[coord]:
             mc = intersections[coord][context]['5mC']
             uc = intersections[coord][context]['C']
-            if (uc+mc) > min_obs_nuc:
+            if int(uc+mc) > min_obs_nuc:
                 print '%s\t%s\t%d\t%d\t%.1f' %(coord, context, mc, uc+mc,
-                                               mc/(mc+uc)*100)
-
-
-
+                                               float(mc)/float(mc+uc)*100)
 
 
 def main():
