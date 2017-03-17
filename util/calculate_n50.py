@@ -1,38 +1,33 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import argparse
 import re
 
 
 """calculate_n50.py:
-Produce the assembly statistics given a WGA FASTA file."""
+Produce standard assembly statistics given a WGA FASTA file."""
 
 
 def read_sizes_from_fasta_file(filename, min_length):
     """Return sort sizes and total WGA length (>min_length) in FASTA file"""
-    f = open(filename, 'r')
-    line = f.readline()
     sizes = []
     sum_length = 0
     cur_length = 0
+    with open(filename, 'r') as infile:
+        for line in infile:
+            line=line.strip()
+            if line.startswith(">"):
+                if cur_length >= min_length:
+                    sizes.append(cur_length)
+                    sum_length += cur_length
+                cur_length = 0
+            else:
+                cur_length += len(line)
+        if cur_length >= min_length:
+            sizes.append(cur_length)
+            sum_length += cur_length
 
-    while line:
-        line=line.rstrip("\n")
-        if line.startswith(">"):
-            if cur_length >= min_length:
-                sizes.append(cur_length)
-                sum_length += cur_length
-            cur_length = 0
-        else:
-            cur_length += len(line)
-
-        line = f.readline()
-
-    if cur_length >= min_length:
-        sizes.append(cur_length)
-        sum_length += cur_length
-
-    sizes.sort(reverse=True)
+        sizes.sort(reverse=True)
 
     return sizes, sum_length
 
@@ -71,10 +66,10 @@ def main():
     parser.add_argument("--min_length", type=int, default=200,
         help="only consider sequences greater than this length")
     parser.add_argument('-l', '--min_seq_length', type=int, default=200)
-#    parser.add_argument("fasta_file", type=str)
+    parser.add_argument("fasta_file", type=str)
     args = parser.parse_args()
-    print_summary('../test_data/wga.fasta',args.min_seq_length)
-
+#    print_summary('../test_data/wga.fasta',args.min_seq_length)
+    print_summary(args.fasta_file,args.min_seq_length)
 
 if __name__ == "__main__":
     main()
