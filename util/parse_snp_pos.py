@@ -6,14 +6,25 @@ import argparse
 import sys
 import pysam
 
+"""parse_snp_pos.py: Calculate where a base is located on the reference
+given read alignment (SAM) file and base positions(BED) on the reads, ."""
+
+
 HI_CONF = 95.0
 
 def load_pos_in_bed_file(pos_file):
+    """
+    load_pos_in_bed_file
+    :param pos_file: input bed filename
+    """
     queries = {}
     with open(pos_file, 'r') as infile:
         for line in infile:
             q = line.strip().split('\t')
-            queries[q[0]] = [q[1], q[2]]
+            try:
+                queries[q[0]] = [q[1], q[2]]
+            except IndexError:
+                pass
     return queries
 
 def get_confidence_level(perc):
