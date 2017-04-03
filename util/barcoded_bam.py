@@ -17,7 +17,7 @@ def read_bam(filename):
 def main():
     parser = argparse.ArgumentParser(
         description='Parser for barcoded BAM')
-    parser.add_argument('-mi', '--molecule_only', type=boolean, default=TRUE)
+    parser.add_argument('-mi', '--molecule_only', type=bool, default=1)
     parser.add_argument('bam_filename', type=str)
     args = parser.parse_args()
     read_bam(args.bam_filename)
