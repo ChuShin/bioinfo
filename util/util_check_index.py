@@ -17,13 +17,16 @@ def print_indices_summary(fastq_file, num_indices):
     with gzip.open(fastq_file, 'r') as infile:
         for line in infile:
             if line.startswith('@'):
-                [header, index] = line.strip().split(' ')
-                read_count += 1
-                index_lib[index] += 1
+                try:
+                    [header, index] = line.strip().split(' ')
+                    read_count += 1
+                    index_lib[index] += 1
+                except ValueError:
+                    continue
     for index in sorted(index_lib, key=index_lib.get, reverse=True)[0:num_indices]:
-        print '%s\t%s\t%s\t%d' %(fastq_file, rank, index, index_lib[index])
+        print '%s\t%d\t%s\t%d' %(fastq_file, rank, index, index_lib[index])
         rank += 1
-    print '%s\t%d' %(fastq_file, read_count)
+    print '%s\tNA\tall\t%d' %(fastq_file, read_count)
 
 
 def main():
