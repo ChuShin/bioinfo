@@ -21,7 +21,7 @@ def print_indices_summary(fastq_file, num_indices):
                 read_count += 1
                 index_lib[index] += 1
     for index in sorted(index_lib, key=index_lib.get, reverse=True)[0:num_indices]:
-        print '%s\t%\t%s\t%d' %(fastq_file, rank, index, index_lib[index])
+        print '%s\t%s\t%s\t%d' %(fastq_file, rank, index, index_lib[index])
         rank += 1
     print '%s\t%d' %(fastq_file, read_count)
 
