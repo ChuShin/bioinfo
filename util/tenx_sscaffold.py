@@ -11,15 +11,17 @@ extract border barcodes with zero coverage check if possible for superscaffoldin
 
 
 def read_bam(bam_filename, region_filename, min_score):
-    samfile = pysam.AlignmentFile(filename, 'rb')
+    samfile = pysam.AlignmentFile(bam_filename, 'rb')
     with open(region_filename, 'r') as bed:
         for region in bed:
             try:
                 (chr, start, end) = region.strip().split('\t')
             except ValueError:
                 continue
-            alignments = samfile.fetch(chr, start, end)
-            print alignments
+            for alignment in samfile.fetch(chr, int(start), int(end)):
+                aln_tags = dict(alignment.tags)
+                if aln_tags['AS'] > min_score:
+                    print alignment
 
 
     samfile.close()
