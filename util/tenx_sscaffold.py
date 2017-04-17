@@ -31,7 +31,7 @@ def get_barcodes_in_region(samfile, chr, start, end, min_score):
 
 
 def get_barcodes_in_scaffold(bam_filename, region_filename, window, min_score):
-    barcodes = defaultdict(lambda : (lambda : (lambda : list(int))))
+    barcodes = defaultdict(lambda : (lambda : str))
     samfile = pysam.AlignmentFile(bam_filename, 'rb')
     with open(region_filename, 'r') as bed:
         for region in bed:
@@ -45,15 +45,14 @@ def get_barcodes_in_scaffold(bam_filename, region_filename, window, min_score):
                 p5_end = int(start) + window - 1
                 p3_start = int(end) - window
                 p3_end = int(end)
-                p5_barcodes = get_barcodes_in_region(samfile, chr, p5_start, p5_end, min_score)
-                print p5_barcodes
-                p3_barcodes = get_barcodes_in_region(samfile, chr, p3_start, p3_end, min_score)
-                print p3_barcodes
+                barcodes[chr][scaffold]['p5'] = \
+                    get_barcodes_in_region(samfile, chr, p5_start, p5_end, min_score)
+                barcodes[chr][scaffold]['p3'] = \
+                    get_barcodes_in_region(samfile, chr, p3_start, p3_end, min_score)
             else:
                 print 'skipped: %s is smaller than 2 * %d min_length' %(scaffold, window)
-
-
     samfile.close()
+    return barcodes
 
 
 
