@@ -31,12 +31,14 @@ def get_barcodes_in_region(samfile, chr, start, end, min_score):
 
 
 def get_barcodes_in_scaffold(bam_filename, region_filename, window, min_score):
-    barcodes = defaultdict(lambda : (lambda : (lambda : list(int))))
+    barcodes = defaultdict(lambda : defaultdict(lambda : defaultdict(list)))
+    chromosomes = defaultdict(list)
     samfile = pysam.AlignmentFile(bam_filename, 'rb')
     with open(region_filename, 'r') as bed:
         for region in bed:
             try:
                 (chr, start, end, scaffold) = region.strip().split('\t')
+                chromosomes[chr].append([scaffold, int(end) - int(start) + 1])
             except ValueError:
                 print 'invalid line: %s' %(region)
                 continue
@@ -45,17 +47,34 @@ def get_barcodes_in_scaffold(bam_filename, region_filename, window, min_score):
                 p5_end = int(start) + window - 1
                 p3_start = int(end) - window
                 p3_end = int(end)
-                p5_barcodes = get_barcodes_in_region(samfile, chr, p5_start, p5_end, min_score)
-                print p5_barcodes
-                p3_barcodes = get_barcodes_in_region(samfile, chr, p3_start, p3_end, min_score)
-                print p3_barcodes
+                barcodes[chr][scaffold]['p5'] = \
+                    get_barcodes_in_region(samfile, chr, p5_start, p5_end, min_score)
+                barcodes[chr][scaffold]['p3'] = \
+                    get_barcodes_in_region(samfile, chr, p3_start, p3_end, min_score)
             else:
                 print 'skipped: %s is smaller than 2 * %d min_length' %(scaffold, window)
-
-
     samfile.close()
+    return barcodes, chromosomes
 
+def cmp_barcodes(list1, list2):
+    return len(set(list1).intersection(list2))
 
+def check_barcode_pairs(barcodes, chromosomes):
+    for chr in sorted(chromosomes.items):
+        for idx, scaffold_info in enumerate(chromosomes[chr]):
+            try:
+                scaffold, scaffold_len = scaffold_info
+                nscaffold, nscaffold_len = chromosomes[chr][idx+1]
+                num_links = cmp_barcodes(barcodes[chr][scaffold]['p3'],barcodes[chr][nscaffold]['p5'])
+                num_revlinks = cmp_barcodes(barcodes[chr][scaffold]['p3'],barcodes[chr][nscaffold]['p3'])
+                if num_links > 5:
+                    print '%s join : %s %s %d %d %d' %(chr, scaffold, nscaffold, num_links, num_revlinks, scaffold_len)
+                if num_revlinks > 5:
+                    print '%s revjoin : %s %s %d %d %d' %(chr, scaffold, nscaffold, num_links, num_revlinks, scaffold_len)
+                if (num_links < 5 and num_revlinks < 5):
+                        print '%s %s %d' %(chr, scaffold, scaffold_len)
+            except IndexError:
+                continue
 
 def main():
     parser = argparse.ArgumentParser(
@@ -66,8 +85,10 @@ def main():
     parser.add_argument('bam_filename', type=str)
     parser.add_argument('region_filename', type=str)
     args = parser.parse_args()
-    get_barcodes_in_scaffold(args.bam_filename, args.region_filename, args.end_window, args.min_score)
-
+    barcodes, chromosomes = \
+        get_barcodes_in_scaffold(args.bam_filename, args.region_filename, args.end_window, args.min_score)
+    check_barcode_pairs(barcodes, chromosomes)
+    
 
 if __name__ == '__main__':
     main()
