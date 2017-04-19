@@ -60,7 +60,7 @@ def cmp_barcodes(list1, list2):
     return len(set(list1).intersection(list2))
 
 def check_barcode_pairs(barcodes, chromosomes):
-    for chr in sorted(chromosomes.items):
+    for chr in sorted(chromosomes):
         for idx, scaffold_info in enumerate(chromosomes[chr]):
             try:
                 scaffold, scaffold_len = scaffold_info
@@ -71,10 +71,10 @@ def check_barcode_pairs(barcodes, chromosomes):
                     print '%s join : %s %s %d %d %d' %(chr, scaffold, nscaffold, num_links, num_revlinks, scaffold_len)
                 if num_revlinks > 5:
                     print '%s revjoin : %s %s %d %d %d' %(chr, scaffold, nscaffold, num_links, num_revlinks, scaffold_len)
-                if (num_links < 5 and num_revlinks < 5):
+                if (num_links <= 5 and num_revlinks <= 5):
                         print '%s %s %d' %(chr, scaffold, scaffold_len)
             except IndexError:
-                continue
+                print '%s %s %d' %(chr, scaffold, scaffold_len)
 
 def main():
     parser = argparse.ArgumentParser(
