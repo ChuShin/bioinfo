@@ -1,0 +1,84 @@
+#!/usr/bin/perl -w
+
+#  Copyright 2012 ChuShin Koh<ChuShin.Koh@nrc.ca>
+#  
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#  
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+
+use strict;
+use Bio::SeqIO;
+use Getopt::Long;
+
+my $seq_file;
+my $bed_file;
+my $out_file;
+
+GetOptions("seq_file=s" => \$seq_file,
+    "bed_file=s" => \$bed_file,
+    "out_file=s" => \$out_file);
+
+unless (defined $seq_file && $bed_file && $out_file) {
+print<<EOF;
+
+This utility script requires two input files: a multi-FASTA file, 
+and a six column 1-based BED file (chr, start, end, name, score, strand)
+that describes a list of sub-sequences to extract from the FASTA file. The
+script produces the sub-sequences in FASTA format.
+
+Usage:
+    util_extract_region_list
+        --bed_file    [-b]   input BED file
+        --seq_file    [-s]   input sequences in FASTA format
+        --out_file    [-o]   output sub-sequence in FASTA file
+
+EOF
+exit 1;
+}
+
+
+my $seqs = Bio::SeqIO->new(-format=>'fasta', -file=>$seq_file);
+my %db;
+
+while(my $seq = $seqs->next_seq()) {
+    $db{$seq->id}=$seq->seq;
+}
+
+open(LST,"<".$bed_file) || die "cannot open BED file\n";
+open(OUT,">".$out_file) || die "cannot write output\n";
+while(<LST>) {
+    chomp;
+    my ($sc, $start, $end, $name, $score, $strand) =(split("\t",$_));
+    die "Invalid BED file\n" unless ($strand eq '+' || $strand eq '-');
+    if(exists($db{$sc})) {
+        my $length = $end - $start + 1;
+        print OUT ">".$name." ".join("_",$sc,$start,$end);
+        print OUT "(".$strand.")\n";
+        my $out_seq = substr($db{$sc},$start-1,$length);
+        if($strand eq '-') {
+            my $tmpseq = Bio::PrimarySeq->new (-seq => $out_seq);
+            $out_seq = $tmpseq->revcom->seq;
+        }
+    
+        print OUT pretty_print($out_seq,60)."\n";
+    }
+}
+
+
+sub pretty_print {
+    my ($seq,$block) = @_;
+    my $num= int(length($seq) / $block);
+    my $results ='';
+    for(my $i=0; $i<=$num; $i++) {
+        my $str = substr($seq,$i*$block,$block);
+        $results.=$str."\n" if ( length $str );
+    }
+    return $results;
+}
