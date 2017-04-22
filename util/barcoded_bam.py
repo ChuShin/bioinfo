@@ -3,8 +3,9 @@
 import argparse
 import pysam
 import sys
+from collections import defaultdict
 
-def read_bam(filename, min_score):
+def basic_read_bam(filename, min_score):
     samfile = pysam.AlignmentFile(filename, 'rb')
     for read in samfile.fetch():
         read_tags = dict(read.tags)
@@ -13,6 +14,19 @@ def read_bam(filename, min_score):
                                          read.reference_start, read_tags['MI'],
                                          read_tags['BX'])
     samfile.close()
+
+
+def read_bam(filename, min_score):
+    mol_coords = defaultdict(lambda : defaultdict(lambda: list(int)))
+    samfile = pysam.AlignmentFile(filename, 'rb')
+    for read in samfile.fetch():
+        read_tags = dict(read.tags)
+        if 'MI' in read_tags and read_tags['AS'] >= min_score:
+
+
+
+    samfile.close()
+
 
 
 def main():
