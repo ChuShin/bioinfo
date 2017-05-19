@@ -1,0 +1,3 @@
+scaffold3790	maker	gene	1163	2427	.	-	.	ID=maker-scaffold3790-snap-gene-0.0;Name=maker-scaffold3790-snap-gene-0.0
+scaffold3790	maker	mRNA	1163	2427	.	-	.	ID=maker-scaffold3790-snap-gene-0.0-mRNA-1;Parent=maker-scaffold3790-snap-gene-0.0;Name=maker-scaffold3790-snap-gene-0.0
+scaffold3790	maker	exon	2111	2427	.	-	.	ID=maker-scaffold3790-snap-gene-0.0-mRNA-1.exon1;Parent=maker-scaffold3790-snap-gene-0.0-mRNA-1
