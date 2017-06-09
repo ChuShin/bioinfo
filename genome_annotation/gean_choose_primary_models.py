@@ -32,6 +32,7 @@ def read_gff(filename):
     with open(filename, 'r') as gff_file:
         for line in gff_file:
             gff = GFF(line)
+            print gff.ref
 
 
 
@@ -44,7 +45,6 @@ def main():
     parser.add_argument('gff_filename', type=str)
     args = parser.parse_args()
     read_gff(args.gff_filename)
-
 
 if __name__ == '__main__':
     main()
