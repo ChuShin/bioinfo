@@ -46,9 +46,9 @@ def get_barcodes_in_scaffold(bam_filename, region_filename, window, min_score):
                 p5_end = int(start) + window - 1
                 p3_start = int(end) - window
                 p3_end = int(end)
-                print "%s\t%d\t%d\t%s\t%s" %(chr, p5_start, p5_end, scaffold,
+                print "%s\tp5\t%d\t%d\t%s\t%s" %(chr, p5_start, p5_end, scaffold,
                     get_barcodes_in_region(samfile, chr, p5_start, p5_end, min_score))
-                print "%s\t%d\t%d\t%s\t%s" %(chr, p3_start, p3_end, scaffold,
+                print "%s\tp3\t%d\t%d\t%s\t%s" %(chr, p3_start, p3_end, scaffold,
                     get_barcodes_in_region(samfile, chr, p3_start, p3_end, min_score))
             else:
                 print 'skipped: %s is smaller than 2 * %d min_length' %(scaffold, window)
