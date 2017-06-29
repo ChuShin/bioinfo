@@ -49,7 +49,6 @@ def get_barcodes_in_scaffold(bam_filename, region_filename, window, min_score):
                 p5 = get_barcodes_in_region(samfile, chr, p5_start, p5_end, min_score)
                 for barcode in p5:
                     print "%s\tp5\t%d\t%d\t%s\t%s" %(chr, p5_start, p5_end, scaffold, barcode)
-                print "%s\tp3\t%d\t%d\t%s\t%s" %(chr, p3_start, p3_end, scaffold,
                 p3 = get_barcodes_in_region(samfile, chr, p3_start, p3_end, min_score)
                 for barcode in p3:
                     print "%s\tp3\t%d\t%d\t%s\t%s" %(chr, p3_start, p3_end, scaffold, barcode)
@@ -83,13 +82,13 @@ def main():
         description='Parser for barcoded BAM')
     parser.add_argument('-mi', '--molecule_only', type=bool, default=1)
     parser.add_argument('-ms', '--min_score', type=int, default=100)
-    parser.add_argument('-w', '--end_window', type=int, default=10000)
+    parser.add_argument('-w', '--end_window', type=int, default=30000)
     parser.add_argument('bam_filename', type=str)
     parser.add_argument('region_filename', type=str)
     args = parser.parse_args()
     barcodes, chromosomes = \
         get_barcodes_in_scaffold(args.bam_filename, args.region_filename, args.end_window, args.min_score)
-    check_barcode_pairs(barcodes, chromosomes)
+#    check_barcode_pairs(barcodes, chromosomes)
 
 
 if __name__ == '__main__':
