@@ -65,12 +65,12 @@ def cmp_barcodes(list1, list2):
 
 def check_barcode_pairs(barcodes, scaffs):
     for sc1_ind in range(0,len(scaffs)-1):
-        for sc2_ind in range(1,len(scaffs)):
+        for sc2_ind in range(sc1_ind+1,len(scaffs)):
             sc1, sc1_length = scaffs[sc1_ind]
             sc2, sc2_length = scaffs[sc2_ind]
             num_links = cmp_barcodes(barcodes[sc1]['p3'], barcodes[sc2]['p5']) \
                         + cmp_barcodes(barcodes[sc2]['p3'], barcodes[sc1]['p5'])
-            num_revlinks = com_barcodes(barcodes[sc1]['p5'], barcodes[sc2]['p5']) \
+            num_revlinks = cmp_barcodes(barcodes[sc1]['p5'], barcodes[sc2]['p5']) \
                         + cmp_barcodes(barcodes[sc1]['p3'], barcodes[sc2]['p3'])
             if num_links > 5 or num_revlinks > 5:
                 print '%s\t%d\t%s\t%d\t%d\t%d' %(sc1, sc1_length, sc2, sc2_length, num_links, num_revlinks)
