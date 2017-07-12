@@ -88,7 +88,7 @@ def main():
 
     scaff_barcodes, scaff_lengths = \
         get_barcodes_in_scaffold(args.bam_filename, args.region_filename, args.end_window, args.min_score)
-    check_barcode_pairs(barcodes, chromosomes)
+    check_barcode_pairs(scaff_barcodes, scaff_lengths)
 
 
 if __name__ == '__main__':
