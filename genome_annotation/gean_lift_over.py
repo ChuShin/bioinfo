@@ -6,7 +6,8 @@ import sys
 from collections import defaultdict
 
 """gean_liftover.py:
-Given an input GFF file ."""
+Given an AGP file, convert coordinates in an input GFF/BED file between object
+and component coordinates."""
 
 
 
@@ -14,9 +15,10 @@ Given an input GFF file ."""
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Convert coordinates of GFF file onto new REFs '
-                    'according to an AGP file. ')
+        description='Given an AGP file, convert coordinates in an input '
+                    'GFF/BED file between object and component coordinates')
     parser.add_argument('gff_filename', type=str)
+    parser.add_argument('bed_filename', type=str)
     parser.add_argument('agp_filename', type=str)
     args = parser.parse_args()
     read_gff(args.gff_filename)
