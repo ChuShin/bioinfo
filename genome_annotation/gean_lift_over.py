@@ -19,6 +19,7 @@ def main():
                     'GFF/BED file between object and component coordinates')
     parser.add_argument('gff_filename', type=str)
     parser.add_argument('bed_filename', type=str)
+    parser.add_argument('to_component', type=bool, default=0)
     parser.add_argument('agp_filename', type=str)
     args = parser.parse_args()
     read_gff(args.gff_filename)
