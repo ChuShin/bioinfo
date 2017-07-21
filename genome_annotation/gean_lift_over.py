@@ -19,7 +19,7 @@ def read_agp_file(filename):
                  component_type, component_id, component_beg,
                  component_end, strand] = line.strip().split('\t')
                 if component_type == 'W':
-                    chrs[object][object_end] = {'object_beg': int(object_beg),
+                    chrs[object][int(object_end)] = {'object_beg': int(object_beg),
                                                 'object_end': int(object_end),
                                                 'component_id': component_id,
                                                 'component_beg' : int(component_beg),
@@ -34,8 +34,8 @@ def lift_over(filename, chrs):
             try:
                 [chr, start, end, feature] = \
                     line.strip().split('\t')
-                for position in chrs[chr]:
-                    if position >= start:
+                for position in sorted(chrs[chr]):
+                    if position >= int(start):
                         component = chrs[chr][position]
                         new_start, new_end = lookup(int(start), int(end),
                                                     component)
