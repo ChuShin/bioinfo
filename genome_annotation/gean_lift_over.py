@@ -58,7 +58,7 @@ def lookup(start, end, strand, component):
     new_end = end - component['object_beg']
     new_strand = assign_strand(strand, component['strand'])
 
-    if component['strand'] == '+':
+    if component['strand'] == '+' or component['strand'] == '?':
         new_start = new_start + component['component_beg']
         new_end = new_end + component['component_beg']
     elif component['strand'] == '-':

@@ -47,7 +47,7 @@ def lift_over(filename, chrs):
 
 def lookup(start, end, strand, component):
     new_strand = assign_strand(strand, component['strand'])
-    if component['strand'] == '+':
+    if component['strand'] == '+' or component['strand'] == '?':
         new_start = component['object_beg'] + start - 1
         new_end = component['object_beg'] + end - 1
     elif component['strand'] == '-':
