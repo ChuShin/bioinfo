@@ -14,18 +14,17 @@ def read_agp_file(filename):
     chrs = defaultdict(lambda : defaultdict(lambda: list))
     with open(filename, 'r') as agp:
         for line in agp:
-            if line.startswith('#'):
-                pass
-            [object, object_beg, object_end, part_number,
-             component_type, component_id, component_beg,
-             component_end, strand] = line.strip().split('\t')
-            if component_type == 'W':
-                chrs[object][object_end] = {'object_beg': int(object_beg),
-                                            'object_end': int(object_end),
-                                            'component_id': component_id,
-                                            'component_beg' : int(component_beg),
-                                            'component_end' :int(component_end),
-                                            'strand' : strand}
+            if not line.startswith('#'):
+                [object, object_beg, object_end, part_number,
+                 component_type, component_id, component_beg,
+                 component_end, strand] = line.strip().split('\t')
+                if component_type == 'W':
+                    chrs[object][object_end] = {'object_beg': int(object_beg),
+                                                'object_end': int(object_end),
+                                                'component_id': component_id,
+                                                'component_beg' : int(component_beg),
+                                                'component_end' :int(component_end),
+                                                'strand' : strand}
     return chrs
 
 # to-do: should create a separate class for bed file type
