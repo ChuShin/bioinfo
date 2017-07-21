@@ -32,29 +32,32 @@ def lift_over(filename, chrs):
     with open(filename, 'r') as bed:
         for line in bed:
             try:
-                [chr, start, end, feature] = \
+                [chr, start, end, feature, score, strand] = \
                     line.strip().split('\t')
                 for position in sorted(chrs[chr]):
                     if position >= int(start):
                         component = chrs[chr][position]
-                        new_start, new_end = lookup(int(start), int(end),
-                                                    component)
-                        print '%s\t%d\t%d\t%s' %(component['component_id'],
-                                                 new_start, new_end, feature)
+                        new_start, new_end, new_strand = \
+                            lookup(int(start), int(end), strand, component)
+                        print '%s\t%d\t%d\t%s\t%s\t%s' %(
+                            component['component_id'], new_start, new_end,
+                            feature, score, new_strand)
                         break
             except ValueError:
-                print >> sys.stderr, 'Invalid 4-col bed file, please check format.'
+                print >> sys.stderr, 'Invalid 6-col bed file format.'
                 sys.exit(1)
             except Exception, e:
                 print >> sys.stderr, 'Exception: %s' %str(e)
                 sys.exit(1)
 
-def lookup(start, end, component):
+def lookup(start, end, strand, component):
     if component['object_end'] < end:
         print >> sys.stderr, 'Feature [%d, %d] crossed an object boundary %s' \
                              %(start, end, component)
     new_start = start - component['object_beg']
     new_end = end - component['object_beg']
+    new_strand = assign_strand(strand, component['strand'])
+
     if component['strand'] == '+':
         new_start = new_start + component['component_beg']
         new_end = new_end + component['component_beg']
@@ -62,7 +65,15 @@ def lookup(start, end, component):
         tmp_pos = new_start
         new_start = component['component_end'] - new_end
         new_end = component['component_end'] - tmp_pos
-    return new_start, new_end
+    return new_start, new_end, new_strand
+
+def assign_strand(feature_strand, component_strand):
+    if feature_strand == component_strand:
+        return '+'
+    elif feature_strand != component_strand:
+        return '-'
+
+
 
 def main():
     parser = argparse.ArgumentParser(
