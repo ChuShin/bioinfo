@@ -60,8 +60,8 @@ def lookup(start, end, component):
         new_end = new_end + component['component_beg']
     elif component['strand'] == '-':
         tmp_pos = new_start
-        new_start = component['object_end'] - new_end
-        new_end = component['object_end'] - tmp_pos
+        new_start = component['component_end'] - new_end
+        new_end = component['component_end'] - tmp_pos
     return new_start, new_end
 
 def main():
