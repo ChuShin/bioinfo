@@ -14,6 +14,8 @@ def read_agp_file(filename):
     chrs = defaultdict(lambda : defaultdict(lambda: list))
     with open(filename, 'r') as agp:
         for line in agp:
+            if line.startswith('#'):
+                pass
             [object, object_beg, object_end, part_number,
              component_type, component_id, component_beg,
              component_end, strand] = line.strip().split('\t')
