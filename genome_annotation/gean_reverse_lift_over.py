@@ -4,9 +4,9 @@ import argparse
 import sys
 from collections import defaultdict
 
-"""gean_liftover.py:
-Given an AGP file, convert coordinates in an input GFF/BED file between object
-and component coordinates."""
+"""gean_reverse_lift_over.py:
+Given an AGP file, convert coordinates in an input GFF/BED file from object
+to component coordinates."""
 
 
 # to-do: should create a separate class for agp file type
@@ -57,6 +57,8 @@ def lookup(start, end, strand, component):
 
 
 def assign_strand(feature_strand, component_strand):
+    if component_strand == '?':
+        component_strand = '+'
     if feature_strand == component_strand:
         return '+'
     elif feature_strand != component_strand:
@@ -67,7 +69,7 @@ def assign_strand(feature_strand, component_strand):
 def main():
     parser = argparse.ArgumentParser(
         description='Given an AGP file, convert coordinates in an input '
-                    'GFF/BED file between object and component coordinates')
+                    'GFF/BED file from object to component coordinates')
 #    parser.add_argument('-gff', '--gff_filename', type=str)
     parser.add_argument('-bed', '--bed_filename', type=str)
     parser.add_argument('-c', '--to_component', type=bool, default=0)
