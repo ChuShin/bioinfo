@@ -1,0 +1,63 @@
+#!/usr/bin/perl -w
+
+#  Copyright 2012 ChuShin Koh<ChuShin.Koh@gmail.com>
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+use strict;
+use Getopt::Long;
+
+
+my $in_file;
+my $out_file;
+
+
+GetOptions("input=s" => \$in_file,
+    "output=s" => \$out_file);
+
+unless (defined $in_file && defined $out_file) {
+
+print<<EOF;
+
+Append an incremental integer to the end of fastq header line.
+
+Usage:
+    util_rename_header -i INPUT -o OUTPUT
+
+EOF
+exit 1;
+}
+
+if ($in_file =~ /.gz$/) {
+    open(IN, "gunzip -c $in_file |") || die "cannot open pipe to $in_file";
+}
+else {
+    open(IN, "<".$in_file) || die "cannot open $in_file";
+}
+
+if ($out_file =~ /.gz$/) {
+    open(OUT, "| gzip -c > $out_file") or die "error writing gzip $!";
+}
+else {
+    open(OUT,">".$out_file) || die "cannot write output file\n";
+}
+
+my $read_num = 1;
+while(<IN>) {
+    chomp;
+    my ($header,$suffix) = (split(" ",$_));
+    my $seq = <IN> || die "invalid fastq: missing seq.";
+    my $qual_header = <IN> || die "invalid fastq: missing qual header.";
+    my $qual = <IN> || die "invalid fastq: missing qual.";
+
+    print OUT join(" ",$header.":".$read_num++,$suffix)."\n";
+    print OUT $seq. $qual_header. $qual;
+}
