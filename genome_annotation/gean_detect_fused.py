@@ -1,17 +1,12 @@
 #!/usr/bin/env python
 
-
-import argparse
-import sys
 import argparse
 import sys
 from collections import defaultdict
+from collections import namedtuple
+from itertools import chain
 
 
-
-Ibed = namedtuple('ibed', 'chr, gs, ge, gid, gscore, gstrand, '
-                                    'mchr, mgs, mge, mgid, mgscore, mgstrand,'
-                                    'ovl')
 flatten = chain.from_iterable
 
 
@@ -29,16 +24,21 @@ def merge_ranges(data):
     return merged
 
 def read_ibed_file(filename):
-    genes = defaultdict(lambda: defaultdict(int))
-
+    genes = defaultdict(list)
     with open(filename, 'r') as infile:
         for line in infile:
             dat = line.strip().split('\t')
+            ginfo = "\t".join(dat[1:6])
             if len(dat) == 13:
-                alns.append(Ibed._make(dat))
-    return alns
+                genes[ginfo].append([int(dat[7]),int(dat[8])])
+    return genes
 
-
+def report_fused(genes):
+    for gene in genes:
+        locs = genes[gene]
+        ranges = merge_ranges(locs)
+        if(len(ranges)>1):
+            print gene, ranges
 
 
 def main():
@@ -47,7 +47,7 @@ def main():
     parser.add_argument('ibed_filename', type=str)
     args = parser.parse_args()
     genes = read_ibed_file(args.ibed_filename)
-    lift_over(args.bed_filename,chrs)
+    report_fused(genes)
 
 if __name__ == '__main__':
     main()
