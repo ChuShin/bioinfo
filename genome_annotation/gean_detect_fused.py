@@ -40,7 +40,7 @@ def report_fused(genes):
         ranges = merge_ranges(locs)
         if(len(ranges)>1):
             for range in ranges:
-                print "%s\t%s\t%d" %(ginfo[0], range[0], range[1])
+                print "%s\t%s\t%s\t%d" %(gene, ginfo[0], range[0], range[1])
 
 
 
