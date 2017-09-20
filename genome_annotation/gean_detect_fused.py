@@ -36,9 +36,12 @@ def read_ibed_file(filename):
 def report_fused(genes):
     for gene in genes:
         locs = genes[gene]
+        ginfo = gene.split('\t')
         ranges = merge_ranges(locs)
         if(len(ranges)>1):
-            print gene, ranges
+            for range in ranges:
+                print "%s\t%s\t%d" %(ginfo[0], range[0], range[1])
+
 
 
 def main():
