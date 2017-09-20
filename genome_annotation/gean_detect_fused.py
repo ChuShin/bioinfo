@@ -28,7 +28,7 @@ def read_ibed_file(filename):
     with open(filename, 'r') as infile:
         for line in infile:
             dat = line.strip().split('\t')
-            ginfo = "\t".join(dat[1:6])
+            ginfo = "\t".join(dat[0:5])
             if len(dat) == 13:
                 genes[ginfo].append([int(dat[7]),int(dat[8])])
     return genes

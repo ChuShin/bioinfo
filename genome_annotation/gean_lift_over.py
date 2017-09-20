@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
-import argparse
-import sys
+from collections import namedtuple
 from collections import defaultdict
+from itertools import chain
 
 """gean_liftover.py:
 Given an AGP file, convert coordinates in an input GFF/BED file between object
