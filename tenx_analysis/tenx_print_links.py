@@ -16,26 +16,25 @@ def is_valid_scaffold(start, end, window):
         return False
 
 
-def get_barcodes_in_region(samfile, chr, start, end, min_score):
+def get_appended_barcodes_in_region(samfile, chr, start, end, min_score):
     barcode_freq = defaultdict(int);
     barcodes = [];
     for alignment in samfile.fetch(chr, start, end):
         aln_tags = dict(alignment.tags)
         [read, barcode] = alignment.query_name.split("_")
-        if aln_tags['AS'] > min_score and 'MI' in aln_tags:
-            barcode_freq[aln_tags['BX']] += 1;
+        if aln_tags['AS'] > min_score:
+            barcode_freq[barcode] += 1;
     for barcode in barcode_freq:
         if barcode_freq[barcode] > 1:
             barcodes.append(barcode)
     return barcodes
 
 
-def get_appended_barcodes_in_region(samfile, chr, start, end, min_score):
+def get_barcodes_in_region(samfile, chr, start, end, min_score):
     barcode_freq = defaultdict(int);
     barcodes = [];
     for alignment in samfile.fetch(chr, start, end):
         aln_tags = dict(alignment.tags)
-
         if aln_tags['AS'] > min_score and 'MI' in aln_tags:
             barcode_freq[aln_tags['BX']] += 1;
     for barcode in barcode_freq:
@@ -62,10 +61,10 @@ def get_barcodes_in_scaffold(bam_filename, region_filename, window, min_score):
                 p5_end = int(start) + window - 1
                 p3_start = int(end) - window
                 p3_end = int(end)
-                p5 = get_barcodes_in_region(samfile, chr, p5_start, p5_end, min_score)
+                p5 = get_appended_barcodes_in_region(samfile, chr, p5_start, p5_end, min_score)
                 for barcode in p5:
                     print "%s\tp5\t%d\t%d\t%s\t%s" %(chr, p5_start, p5_end, scaffold, barcode)
-                p3 = get_barcodes_in_region(samfile, chr, p3_start, p3_end, min_score)
+                p3 = get_appended_barcodes_in_region(samfile, chr, p3_start, p3_end, min_score)
                 for barcode in p3:
                     print "%s\tp3\t%d\t%d\t%s\t%s" %(chr, p3_start, p3_end, scaffold, barcode)
                 scaff_barcodes[scaffold]['p5']= p5
