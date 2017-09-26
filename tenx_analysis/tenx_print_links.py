@@ -21,12 +21,28 @@ def get_barcodes_in_region(samfile, chr, start, end, min_score):
     barcodes = [];
     for alignment in samfile.fetch(chr, start, end):
         aln_tags = dict(alignment.tags)
+        [read, barcode] = alignment.query_name.split("_")
         if aln_tags['AS'] > min_score and 'MI' in aln_tags:
             barcode_freq[aln_tags['BX']] += 1;
     for barcode in barcode_freq:
         if barcode_freq[barcode] > 1:
             barcodes.append(barcode)
     return barcodes
+
+
+def get_appended_barcodes_in_region(samfile, chr, start, end, min_score):
+    barcode_freq = defaultdict(int);
+    barcodes = [];
+    for alignment in samfile.fetch(chr, start, end):
+        aln_tags = dict(alignment.tags)
+
+        if aln_tags['AS'] > min_score and 'MI' in aln_tags:
+            barcode_freq[aln_tags['BX']] += 1;
+    for barcode in barcode_freq:
+        if barcode_freq[barcode] > 1:
+            barcodes.append(barcode)
+    return barcodes
+
 
 
 def get_barcodes_in_scaffold(bam_filename, region_filename, window, min_score):
