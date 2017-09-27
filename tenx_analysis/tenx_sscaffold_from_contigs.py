@@ -53,7 +53,7 @@ def get_barcode_in_contigs(bam_filename, region_filename, window, min_score):
                 barcodes[contig]['p3'] = \
                     get_appended_barcodes_in_region(samfile, contig, p3_start, p3_end, min_score)
             else:
-                print 'skipped: %s is smaller than 2 * %d min_length' %(scaffold, window)
+                #print 'skipped: %s is smaller than 2 * %d min_length' %(contig, window)
     samfile.close()
     return barcodes, contigs
 
@@ -61,21 +61,20 @@ def cmp_barcodes(list1, list2):
     return len(set(list1).intersection(list2))
 
 def check_barcode_pairs(barcodes, contigs):
-    for ctg in sorted(contigs):
-        for idx, contig_info in enumerate(contigs[ctg]):
-            try:
-                contig, contig_len = contig_info
-                ncontig, ncontig_len = contigs[ctg][idx+1]
-                num_links = cmp_barcodes(barcodes[chr][contig]['p3'],barcodes[chr][ncontig]['p5'])
-                num_revlinks = cmp_barcodes(barcodes[chr][contig]['p3'],barcodes[chr][ncontig]['p3'])
-                if num_links > 5:
-                    print '%s join : %s %s %d %d %d' %(chr, contig, ncontig, num_links, num_revlinks, contig_len)
-                if num_revlinks > 5:
-                    print '%s revjoin : %s %s %d %d %d' %(chr, contig, ncontig, num_links, num_revlinks, contig_len)
-                if (num_links <= 5 and num_revlinks <= 5):
-                        print '%s %s %d' %(chr, contig, contig_len)
-            except IndexError:
-                print '%s %s %d' %(chr, contig, contig_len)
+    for idx, contig_info in enumerate(contigs[ctg]):
+        try:
+            contig, contig_len = contig_info
+            ncontig, ncontig_len = contigs[ctg][idx+1]
+            num_links = cmp_barcodes(barcodes[contig]['p3'],barcodes[ncontig]['p5'])
+            num_revlinks = cmp_barcodes(barcodes[contig]['p3'],barcodes[ncontig]['p3'])
+            if num_links > 5:
+                print '%s join : %s %s %d %d %d' %(contig, ncontig, num_links, num_revlinks, contig_len)
+            if num_revlinks > 5:
+                print '%s revjoin : %s %s %d %d %d' %(contig, ncontig, num_links, num_revlinks, contig_len)
+            if (num_links <= 5 and num_revlinks <= 5):
+                    print '%s %s %d' %(chr, contig, contig_len)
+        except IndexError:
+            print '%s %s %d' %(contig, contig_len)
 
 def main():
     parser = argparse.ArgumentParser(
