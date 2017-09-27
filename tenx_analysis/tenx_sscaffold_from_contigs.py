@@ -61,21 +61,18 @@ def cmp_barcodes(list1, list2):
     return len(set(list1).intersection(list2))
 
 def check_barcode_pairs(barcodes, contigs):
-    for idx, contig_info in enumerate(contigs):
-        try:
-            contig, contig_len = contig_info
-            for idx2 in range(idx+1, len(contigs)):
-                ncontig, ncontig_len = contigs[idx+1]
-                num_links = cmp_barcodes(barcodes[contig]['p3'],barcodes[ncontig]['p5'])
-                num_revlinks = cmp_barcodes(barcodes[contig]['p3'],barcodes[ncontig]['p3'])
-               if num_links > 5:
-                    print '%s join : %s %s %d %d %d' %(contig, ncontig, num_links, num_revlinks, contig_len)
-                if num_revlinks > 5:
-                    print '%s revjoin : %s %s %d %d %d' %(contig, ncontig, num_links, num_revlinks, contig_len)
-                if (num_links <= 5 and num_revlinks <= 5):
-                    print '%s %s %d' %(chr, contig, contig_len)
-            except IndexError:
-                print '%s %s %d' %(contig, contig_len)
+    for idx in range(0,len(contigs)):
+        contig, contig_len = contigs[idx]
+        for idx2 in range(idx+1, len(contigs)):
+            ncontig, ncontig_len = contigs[idx+1]
+            num_links = cmp_barcodes(barcodes[contig]['p3'],barcodes[ncontig]['p5'])
+            num_revlinks = cmp_barcodes(barcodes[contig]['p3'],barcodes[ncontig]['p3'])
+            if num_links > 5:
+                print '%s join : %s %s %d %d %d' %(contig, ncontig, num_links, num_revlinks, contig_len)
+            if num_revlinks > 5:
+                print '%s revjoin : %s %s %d %d %d' %(contig, ncontig, num_links, num_revlinks, contig_len)
+            if (num_links <= 5 and num_revlinks <= 5):
+                print '%s %s %d' %(chr, contig, contig_len)
 
 
 def main():
