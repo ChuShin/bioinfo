@@ -71,8 +71,8 @@ def check_barcode_pairs(barcodes, contigs):
                 print '%s join : %s %s %d %d %d' %(contig, ncontig, num_links, num_revlinks, contig_len)
             if num_revlinks > 5:
                 print '%s revjoin : %s %s %d %d %d' %(contig, ncontig, num_links, num_revlinks, contig_len)
-            if (num_links <= 5 and num_revlinks <= 5):
-                print '%s %s %d' %(chr, contig, contig_len)
+            #if (num_links <= 5 and num_revlinks <= 5):
+            #    print '%s %s %d' %(contig, contig_len)
 
 
 def main():
