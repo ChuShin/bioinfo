@@ -64,7 +64,7 @@ def check_barcode_pairs(barcodes, contigs):
     for idx in range(0,len(contigs)):
         contig, contig_len = contigs[idx]
         for idx2 in range(idx+1, len(contigs)):
-            ncontig, ncontig_len = contigs[idx+1]
+            ncontig, ncontig_len = contigs[idx2]
             num_links = cmp_barcodes(barcodes[contig]['p3'],barcodes[ncontig]['p5'])
             num_revlinks = cmp_barcodes(barcodes[contig]['p3'],barcodes[ncontig]['p3'])
             if num_links > 5:
