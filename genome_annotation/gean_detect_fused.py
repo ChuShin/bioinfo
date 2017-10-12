@@ -7,6 +7,11 @@ from collections import namedtuple
 from itertools import chain
 
 
+"""gean_detect_fused.py:
+Given an intersected BED file produced by bedtools-intersectbed,
+report potential fused genes in the annotation."""
+
+
 flatten = chain.from_iterable
 
 
