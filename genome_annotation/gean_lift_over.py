@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import sys
+import argparse
 from collections import namedtuple
 from collections import defaultdict
 from itertools import chain
