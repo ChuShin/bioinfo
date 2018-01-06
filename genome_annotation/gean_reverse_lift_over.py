@@ -32,12 +32,15 @@ def lift_over(filename, chrs):
             try:
                 [chr, start, end, feature, score, strand] = \
                     line.strip().split('\t')
-                component = chrs[chr]
-                new_start, new_end, new_strand = \
-                    lookup(int(start), int(end), strand, component)
-                print '%s\t%d\t%d\t%s\t%s\t%s' %(
-                    component['object'], new_start, new_end,
-                    feature, score, new_strand)
+                if chr in chrs.keys():
+                    component = chrs[chr]
+                    new_start, new_end, new_strand = \
+                        lookup(int(start), int(end), strand, component)
+                    print '%s\t%d\t%d\t%s\t%s\t%s' %(
+                        component['object'], new_start, new_end,
+                        feature, score, new_strand)
+                else:
+                    print '%s does not exists in AGP' %(chr)
             except ValueError:
                 print >> sys.stderr, 'Invalid 6-col bed file format.'
                 sys.exit(1)
