@@ -1,0 +1,5 @@
+chr4	100	200	scaffold10	3000    3100
+chr4    300 400 scaffold10  2800    2900
+chr4    500 600 scaffold10  2300    2400
+chr4    900 1000    scaffold5   100 200
+chr4    1200    1300    scaffold5   300 400
