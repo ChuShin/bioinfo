@@ -48,7 +48,7 @@ def filter_promicuous_scaffolds(scaffolds):
         if len(coords) > 1:
             corr = numpy.corrcoef(sc_chr_coords,sc_coords)
     #        print corr[0][1]
-           if len(coords)>1 and corr[0][1] < 0:
+            if corr[0][1] < 0:
                 sc_orient = '-'
         chromosomes[chr][sc].append([sc_anchor_pos, num_best,sc_orient])
     return chromosomes
