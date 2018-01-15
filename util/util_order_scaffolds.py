@@ -53,6 +53,8 @@ def filter_promicuous_scaffolds(scaffolds):
                     sc_orient = '-'
             except Exception, e:
                 pass
+        else:
+            sc_orient = '?'
 
         chromosomes[chr][sc].append([sc_anchor_pos, num_best,sc_orient])
     return chromosomes
