@@ -5,8 +5,8 @@ import sys
 from collections import defaultdict
 
 """gean_reverse_lift_over.py:
-Given an AGP file, convert coordinates in an input GFF/BED file from object
-to component coordinates."""
+Given an AGP file, convert coordinates in an input GFF/BED file from component
+coordinates into object coordinates."""
 
 
 # to-do: should create a separate class for agp file type
@@ -67,7 +67,6 @@ def gff_lift_over(filename, chrs):
                             component['object'], source, feature_type,
                             new_start, new_end, score, strand, frame,
                             feature_name)
-                        break
                     else:
                         print '%s does not exists in AGP' %(chr)
             except ValueError:

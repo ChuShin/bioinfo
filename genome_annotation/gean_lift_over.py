@@ -7,8 +7,8 @@ from collections import defaultdict
 from itertools import chain
 
 """gean_liftover.py:
-Given an AGP file, convert coordinates in an input GFF/BED file between object
-and component coordinates."""
+Given an AGP file, convert coordinates in an input GFF/BED file from object
+coordinates to component."""
 
 
 # to-do: create a separate class for agp file type
