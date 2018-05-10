@@ -67,7 +67,7 @@ def gff_lift_over(filename, chrs):
                             component['object'], source, feature_type,
                             new_start, new_end, score, strand, frame,
                             feature_name)
-                            break
+                        break
                     else:
                         print '%s does not exists in AGP' %(chr)
             except ValueError:
