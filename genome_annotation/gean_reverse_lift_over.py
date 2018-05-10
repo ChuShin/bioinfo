@@ -64,8 +64,10 @@ def gff_lift_over(filename, chrs):
                         new_start, new_end, new_strand = \
                             lookup(int(start), int(end), strand, component)
                         print '%s\t%d\t%d\t%s\t%s\t%s' %(
-                            component['object'], new_start, new_end,
-                            feature, score, new_strand)
+                            component['object'], source, feature_type,
+                            new_start, new_end, score, strand, frame,
+                            feature_name)
+                            break
                     else:
                         print '%s does not exists in AGP' %(chr)
             except ValueError:
