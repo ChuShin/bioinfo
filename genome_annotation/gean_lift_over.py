@@ -117,9 +117,9 @@ def main():
     parser.add_argument('agp_filename', type=str)
     args = parser.parse_args()
     chrs = read_agp_file(args.agp_filename)
-    if args.gff_filename:
+    if args.gff_filename is not None:
         gff_lift_over(args.gff_filename,chrs)
-    elif args.bed_filename:
+    elif args.bed_filename is not None:
         bed_lift_over(args.bed_filename,chrs)
     else:
         print >> sys.stderr, 'Please provide either a GFF or BED file'
