@@ -26,7 +26,7 @@ def read_agp_file(filename):
     return chrs
 
 # to-do: should create a separate class for bed file type
-def lift_over(filename, chrs):
+def bed_lift_over(filename, chrs):
     with open(filename, 'r') as bed:
         for line in bed:
             try:
@@ -47,6 +47,34 @@ def lift_over(filename, chrs):
             except Exception, e:
                 print >> sys.stderr, 'Exception: %s' %str(e)
                 sys.exit(1)
+
+
+# to-do: should create a separate class for bed file type
+def gff_lift_over(filename, chrs):
+    with open(filename, 'r') as gff:
+        for line in gff:
+            try:
+                if line.startswith('#'):
+                    print line
+                else:
+                    [chr, source, feature_type, start, end, score, strand,
+                     frame, feature_name] = line.strip().split('\t')
+                    if chr in chrs.keys():
+                        component = chrs[chr]
+                        new_start, new_end, new_strand = \
+                            lookup(int(start), int(end), strand, component)
+                        print '%s\t%d\t%d\t%s\t%s\t%s' %(
+                            component['object'], new_start, new_end,
+                            feature, score, new_strand)
+                    else:
+                        print '%s does not exists in AGP' %(chr)
+            except ValueError:
+                print >> sys.stderr, 'Invalid 6-col bed file format.'
+                sys.exit(1)
+            except Exception, e:
+                print >> sys.stderr, 'Exception: %s' %str(e)
+                sys.exit(1)
+
 
 def lookup(start, end, strand, component):
     new_strand = assign_strand(strand, component['strand'])
@@ -73,13 +101,20 @@ def main():
     parser = argparse.ArgumentParser(
         description='Given an AGP file, convert coordinates in an input '
                     'GFF/BED file from object to component coordinates')
-#    parser.add_argument('-gff', '--gff_filename', type=str)
+    parser.add_argument('-gff', '--gff_filename', type=str)
     parser.add_argument('-bed', '--bed_filename', type=str)
     parser.add_argument('-c', '--to_component', type=bool, default=0)
     parser.add_argument('agp_filename', type=str)
     args = parser.parse_args()
     chrs = read_agp_file(args.agp_filename)
-    lift_over(args.bed_filename,chrs)
+    if args.gff_filename is not None:
+        gff_lift_over(args.gff_filename,chrs)
+    elif args.bed_filename is not None:
+        bed_lift_over(args.bed_filename,chrs)
+    else:
+        print >> sys.stderr, 'Please provide either a GFF or BED file'
+        sys.exit(1)
+
 
 if __name__ == '__main__':
     main()
