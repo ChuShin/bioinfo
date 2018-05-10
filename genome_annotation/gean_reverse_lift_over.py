@@ -63,7 +63,7 @@ def gff_lift_over(filename, chrs):
                         component = chrs[chr]
                         new_start, new_end, new_strand = \
                             lookup(int(start), int(end), strand, component)
-                        print '%s\t%d\t%d\t%s\t%s\t%s' %(
+                        print '%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s' %(
                             component['object'], source, feature_type,
                             new_start, new_end, score, strand, frame,
                             feature_name)
