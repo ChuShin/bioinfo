@@ -19,7 +19,7 @@ use Getopt::Long;
 my $dovetail_file;
 my $agp_file;
 
-GetOptions("dovetail_file=s" => \$dovtail_file,
+GetOptions("dovetail_file=s" => \$dovetail_file,
     "agp_file=s" => \$agp_file);
 
 unless (defined $agp_file && $dovetail_file) {
@@ -37,3 +37,32 @@ Usage:
 EOF
 exit 1;
 }
+
+open(DOVETAIL,"<".$dovetail_file) || die "cannot open input file\n";
+open(AGP,">".$agp_file) || die "cannot write output file\n";
+my $last_sc = '';
+my $last_sc_end = 0;
+my $count = 1;
+
+while(<DOVETAIL>) {
+    chomp;
+    my ($sc, $contig, $c_start, $c_end, $strand, $sc_start, $sc_end) =
+        (split("\t",$_));
+    if($sc ne $last_sc) {
+        $count=1;
+        $last_sc = $sc;
+    }
+    else {
+        print AGP join("\t", $sc, ++$last_sc_end, $sc_start, $count++,'U',
+            '100','scaffold','yes','')."\n";
+    }
+    print AGP join("\t",$last_sc, ++$sc_start, $sc_end, $count++, 'W',
+        $contig, ++$c_start,$c_end, $strand)."\n";
+
+    $last_sc_end = $sc_end;
+}
+
+
+close DOVETAIL;
+close AGP;
+

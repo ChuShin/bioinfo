@@ -1,5 +1,12 @@
-chr4	100	200	scaffold10	3000    3100
-chr4    300 400 scaffold10  2800    2900
-chr4    500 600 scaffold10  2300    2400
-chr4    900 1000    scaffold5   100 200
-chr4    1200    1300    scaffold5   300 400
+chr4	100	200	scaffold10	3000	3100
+chr4	300	400	scaffold10	2800	2900
+chr4	500	600	scaffold10	2300	2400
+chr4	900	1000	scaffold5	100	200
+chr4	1200	1300	scaffold5	300	400
+chr5	500	600	scaffold10	4000	4100
+chr4	1900	2000	scaffold6	100	200
+chr4	2200	2300	scaffold6	300	400
+chr6	1900	2000	scaffold6	100	200
+chr6	2200	2300	scaffold6	300	400
+chr6	2500	2600	scaffold6	600	700
+chr6	2700	2800	scaffold7	600	700
