@@ -100,9 +100,11 @@ def lookup(start, end, strand, component):
     return new_start, new_end, new_strand
 
 def assign_strand(feature_strand, component_strand):
+    if component_strand == '?':
+        component_strand = '+'
     if feature_strand == component_strand:
         return '+'
-    elif feature_strand != component_strand:
+    else:
         return '-'
 
 
