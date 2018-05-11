@@ -108,7 +108,6 @@ def assign_strand(feature_strand, component_strand):
         return '-'
 
 
-
 def main():
     parser = argparse.ArgumentParser(
         description='Given an AGP file, convert coordinates in an input '

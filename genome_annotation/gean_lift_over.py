@@ -91,7 +91,7 @@ def gff_lift_over(filename, chrs):
                 sys.exit(1)
 
 def is_valid_feature(feature_name, feature_start, feature_end, component):
-    if feature_start <= component['component_end']:
+    if feature_start >= component['component_beg']:
         if feature_end <= component['component_end']:
             return True
         else:
