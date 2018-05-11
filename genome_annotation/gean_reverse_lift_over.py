@@ -68,7 +68,8 @@ def gff_lift_over(filename, chrs):
                             new_start, new_end, score, strand, frame,
                             feature_name)
                     else:
-                        print '%s does not exists in AGP' %(chr)
+                        print >> sys.stderr, '%s does not exists in AGP' %(chr)
+                        sys.exit(1)
             except ValueError:
                 print >> sys.stderr, 'Invalid 6-col bed file format.'
                 sys.exit(1)
