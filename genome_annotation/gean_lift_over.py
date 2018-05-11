@@ -89,14 +89,48 @@ def gff_lift_over(filename, chrs):
 
 
 def lookup(start, end, strand, component):
+    new_start = start - component['object_beg']
+    new_end = end - component['object_beg']
     new_strand = assign_strand(strand, component['strand'])
     if component['strand'] == '+' or component['strand'] == '?':
-        new_start = component['object_beg'] + start - 1
-        new_end = component['object_beg'] + end - 1
+        new_start = new_start + component['object_beg']
+        new_end = new_end + component['object_beg']
     elif component['strand'] == '-':
-        new_start = component['object_end'] - end + 1
-        new_end = component['object_end'] - start + 1
+        tmp_pos = new_start
+        new_start = component['object_end'] - new_end
+        new_end = component['object_end'] - tmp_pos
     return new_start, new_end, new_strand
+
+
+
+def lookup(start, end, strand, component):
+    new_start = start - component['object_beg']
+    new_end = end - component['object_beg']
+    new_strand = assign_strand(strand, component['strand'])
+
+    if component['strand'] == '+' or component['strand'] == '?':
+        new_start = new_start + component['component_beg']
+        new_end = new_end + component['component_beg']
+    elif component['strand'] == '-':
+        tmp_pos = new_start
+        new_start = component['component_end'] - new_end
+        new_end = component['component_end'] - tmp_pos
+    return new_start, new_end, new_strand
+
+
+
+def rlookup(start, end, strand, component):
+
+
+    if component['strand'] == '+' or component['strand'] == '?':
+        new_start = new_start + component['component_beg']
+        new_end = new_end + component['component_beg']
+    elif component['strand'] == '-':
+        tmp_pos = new_start
+        new_start = component['component_end'] - new_end
+        new_end = component['component_end'] - tmp_pos
+    return new_start, new_end, new_strand
+
 
 
 def assign_strand(feature_strand, component_strand):
@@ -104,7 +138,7 @@ def assign_strand(feature_strand, component_strand):
         component_strand = '+'
     if feature_strand == component_strand:
         return '+'
-    elif feature_strand != component_strand:
+    else:
         return '-'
 
 
