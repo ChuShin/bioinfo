@@ -2,3 +2,4 @@
 B1	1	4000	1	W	Scaffold00001	1	4000	-
 B1	4001	4100	2	U	100	scaffold	yes	map,align_genus
 B1	4101	8000	3	W	Scaffold00002	1	4000	+
+B2	1	2000	1	W	Scaffold00002	4001	6000	-

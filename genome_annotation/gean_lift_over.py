@@ -20,9 +20,11 @@ def read_agp_file(filename):
                  component_end, strand] = line.strip().split('\t')
                 if component_type == 'W':
                     chrs[component_id][int(component_end)] = {'object': object,
-                                          'object_beg': int(object_beg),
-                                          'object_end': int(object_end),
-                                          'strand' : strand}
+                                            'object_beg': int(object_beg),
+                                            'object_end': int(object_end),
+                                            'component_beg' : int(component_beg),
+                                            'component_end' :int(component_end),
+                                            'strand' : strand}
     return chrs
 
 # to-do: should create a separate class for bed file type
@@ -89,8 +91,8 @@ def gff_lift_over(filename, chrs):
 
 
 def lookup(start, end, strand, component):
-    new_start = start - component['object_beg']
-    new_end = end - component['object_beg']
+    new_start = start - component['component_beg']
+    new_end = end - component['component_beg']
     new_strand = assign_strand(strand, component['strand'])
     if component['strand'] == '+' or component['strand'] == '?':
         new_start = new_start + component['object_beg']
@@ -99,20 +101,6 @@ def lookup(start, end, strand, component):
         tmp_pos = new_start
         new_start = component['object_end'] - new_end
         new_end = component['object_end'] - tmp_pos
-    return new_start, new_end, new_strand
-
-
-
-def rlookup(start, end, strand, component):
-
-
-    if component['strand'] == '+' or component['strand'] == '?':
-        new_start = new_start + component['component_beg']
-        new_end = new_end + component['component_beg']
-    elif component['strand'] == '-':
-        tmp_pos = new_start
-        new_start = component['component_end'] - new_end
-        new_end = component['component_end'] - tmp_pos
     return new_start, new_end, new_strand
 
 
