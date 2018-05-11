@@ -71,7 +71,7 @@ def gff_lift_over(filename, chrs):
                         for position in sorted(chrs[chr]):
                             component = chrs[chr][position]
                             if is_valid_feature(feature_name, int(start),
-                                                int(end), position):
+                                                int(end), component):
                                 new_start, new_end, new_strand = \
                                     lookup(int(start), int(end), strand,
                                            component)
@@ -90,9 +90,10 @@ def gff_lift_over(filename, chrs):
                 print >> sys.stderr, 'Exception: %s' %str(e)
                 sys.exit(1)
 
-def is_valid_feature(feature_name, feature_start, feature_end, position):
-    if feature_start >= position:
-        if feature_end <= position:
+def is_valid_feature(feature_name, feature_start, feature_end, component):
+    if feature_start >= component['component_beg'] and \
+        feature_start <= component['component_end']:
+        if feature_end <= component['component_end']:
             return True
         else:
             print >> sys.stderr, 'Error: %s crossed component boundary' \
