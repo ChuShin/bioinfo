@@ -77,8 +77,8 @@ def gff_lift_over(filename, chrs):
                                            component)
                                 print '%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s' %(
                                     component['object'], source, feature_type,
-                                    new_start, new_end, score, strand, frame,
-                                    feature_name)
+                                    new_start, new_end, score, new_strand,
+                                    frame, feature_name)
                                 break
                     else:
                         print >> sys.stderr, '%s does not exists in AGP' %(chr)

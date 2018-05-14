@@ -72,7 +72,7 @@ def gff_lift_over(filename, chrs):
                             print '%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s' %(
                                 component['component_id'], source,
                                 feature_type, new_start, new_end, score,
-                                strand, frame, feature_name)
+                                new_strand, frame, feature_name)
                             break
             except ValueError:
                 print >> sys.stderr, 'Invalid 9-col GFF file format.'
