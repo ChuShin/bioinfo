@@ -1,0 +1,84 @@
+#!/usr/bin/perl -w
+
+use strict;
+use Getopt::Long;
+
+my $list_file;
+my $input_gff;
+my $output_gff;
+
+GetOptions("list_file=s" => \$list_file,
+    "input_gff=s" => \$input_gff,
+    "output_gff=s" => \$output_gff);
+
+unless (defined $list_file && $input_gff && $output_gff) {
+print<<EOF;
+
+This utility script requires two input files: a genelist file,
+and a GFF file. The script remove features (gene, exon,CDS) associated
+with the input gene ids and output the filtered GFF file.
+
+Usage:
+    gean_remove_gff_features
+        --list_file     [-l]   input gene list
+        --input_gff     [-i]   input GFF file
+        --output_gff    [-o]   output GFF file
+
+EOF
+
+
+open(IDS,"<".$list_file) || die "Usage\n";
+open(GFF,"<".$input_gff) || die "Usage\n";
+open(GFF2,">".$output_gff) || die "Usage\n";
+
+
+my $to_print=0;
+my %valid;
+
+
+while(<IDS>) {
+    chomp;
+    $valid{$_}=1;
+}
+
+close IDS;
+
+
+while(<GFF>) {
+    chomp;
+
+    my ($chr,$src,$type,$start,$end,$score,$strand,$frame,$info) = (split("\t",$_));
+    next unless length($info);
+
+    my $id='';
+    my %attr;
+
+    foreach my $tag (split(";",$info)) {
+        my ($k, $v) = (split("=",$tag));
+        $attr{$k} = $v;
+    }
+
+    if($type eq 'gene') {
+        $id = $attr{ID};
+        if(exists($valid{$id})) {
+            $valid{$attr{ID}} =1;
+        }
+    }
+    elsif($type eq 'mRNA') {
+        $id = $attr{Parent};
+        if(exists($valid{$id})) {
+            $valid{$attr{ID}} =1;
+        }
+    }
+    else {
+#    elsif(grep ( /^$type$/,  ('CDS', 'exon', 'five_prime_UTR', 'three_prime_UTR'))) {
+        $id = $attr{Parent};
+    }
+
+    if(exists($valid{$id})) {
+        print GFF1 $_."\n";
+    }
+    else {
+        print GFF2 $_."\n";
+    }
+}
