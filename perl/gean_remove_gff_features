@@ -77,10 +77,7 @@ while(<GFF>) {
         $id = $attr{Parent};
     }
 
-    if(exists($valid{$id})) {
-        print GFF1 $_."\n";
-    }
-    else {
+    if(!exists($valid{$id})) {
         print GFF2 $_."\n";
     }
 }
