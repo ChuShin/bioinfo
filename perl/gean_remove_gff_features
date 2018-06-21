@@ -25,6 +25,8 @@ Usage:
         --output_gff    [-o]   output GFF file
 
 EOF
+exit 1;
+}
 
 
 open(IDS,"<".$list_file) || die "Usage\n";
