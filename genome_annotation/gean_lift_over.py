@@ -18,7 +18,7 @@ def read_agp_file(filename):
                 [object, object_beg, object_end, part_number,
                  component_type, component_id, component_beg,
                  component_end, strand] = line.strip().split('\t')
-                if component_type == 'W':
+                if component_type == 'W' or component_type == 'D':
                     chrs[component_id][int(component_end)] = {'object': object,
                                             'object_beg': int(object_beg),
                                             'object_end': int(object_end),
