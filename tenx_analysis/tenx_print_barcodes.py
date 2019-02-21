@@ -27,7 +27,7 @@ def get_barcodes_in_region(samfile, chr, start, end, min_score):
     for barcode in barcode_freq:
         if barcode_freq[barcode] > 1:
             barcodes.append(barcode)
-    return list(barcodes)
+    return set(barcodes)
 
 
 def get_barcodes_in_scaffold(bam_filename, region_filename, window, min_score):
