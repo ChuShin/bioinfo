@@ -21,7 +21,8 @@ def get_barcodes_in_region(samfile, chr, start, end, min_score):
     barcodes = [];
     for alignment in samfile.fetch(chr, start, end):
         aln_tags = dict(alignment.tags)
-        if aln_tags['AS'] > min_score and 'MI' in aln_tags:
+        if alignment.mapping_quality > 20 and \
+                aln_tags['AS'] > min_score and 'MI' in aln_tags:
             barcode_freq[aln_tags['BX']] += 1;
     for barcode in barcode_freq:
         if barcode_freq[barcode] > 1:
