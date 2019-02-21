@@ -103,6 +103,7 @@ def summarize_simple(alns, bacs, min_pid, min_aln_len):
                          100 * total_bases / bacs[bac][contig]), locs
 
 
+
 def summarize_combined(alns, bacs, min_pid, min_aln_len):
     """
     simple anchors considers only coverage in query, and makes no attempt to
