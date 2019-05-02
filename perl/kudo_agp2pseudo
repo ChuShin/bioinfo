@@ -1,0 +1,125 @@
+#!/usr/bin/perl -w
+
+#  Copyright 2012 ChuShin Koh<ChuShin.Koh@gmail.ca>
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+
+use strict;
+use Getopt::Long;
+use Bio::SeqIO;
+
+my $seq_file;
+my $out_file;
+my $agp_file;
+my %scaffs;
+
+GetOptions("seq_file=s" => \$seq_file,
+    "agp_file=s" => \$agp_file,
+    "out_file=s" => \$out_file);
+
+unless (defined $seq_file && $agp_file && $out_file) {
+print<<EOF;
+
+This utility script requires two input files: a multi-FASTA file,
+and an AGP file that describes the order and orientation of the
+FASTA sequences within a pseudo-molecule. The script produces
+the pseudo-molecule sequence in FASTA format.
+
+Usage:
+    kudo_agp2pseudo
+        --seq_file    [-s]   input sequences in FASTA format
+        --agp_file    [-a]   AGP file
+        --out_file    [-o]   output pseudo-molecule in FASTA file
+EOF
+exit 1;
+}
+
+
+open(AGP,"<".$agp_file) || die "cannot open agp file\n";
+open(OUT,">".$out_file) || die "cannot write file \n";
+
+my $seqs = Bio::SeqIO->new(-format => 'fasta', -file => $seq_file);
+my $outseq = '';
+my $seqname = '';
+my $cur_outseqname = '';
+
+while(my $seq = $seqs->next_seq()) {
+    $scaffs{$seq->id}=$seq->seq;
+}
+
+
+while(<AGP>) {
+    chomp;
+    next if ($_ =~ /^#/);   ##comments
+    my ($chr,$start,$end,$order,$type,$sc,$sc_s,$sc_length,$strand) = (split("\t",$_));
+
+    $seqname = $chr;
+    if(length($outseq) && $cur_outseqname ne $seqname) {
+        print "Writing pseudo-molecule $cur_outseqname ...\n";
+        print "Total length: ".length($outseq)."\n";
+
+        print OUT ">".$cur_outseqname."\n";
+        print OUT pretty_print($outseq,60);
+        $outseq = '';
+    }
+
+
+    if($type eq 'W') { ## DNA Sequence
+        my $sc_seq = $scaffs{$sc};
+
+        die "Cannot find $sc in database\n" unless defined $sc_seq;
+
+        if($sc_s > 1 || $sc_length != length($sc_seq)) {
+            warn "trimming $sc $sc_s $sc_length\n";
+            $sc_seq = substr($sc_seq,$sc_s-1,$sc_length-$sc_s+1);
+        }
+
+        if($strand eq '-') {
+            print "reverse complementing $sc \n";
+            my $tmpseq = Bio::PrimarySeq->new (-seq => $sc_seq);
+            $sc_seq = $tmpseq->revcom->seq;
+        }
+
+        print "adding $sc to pseudo-molecule $seqname \n";
+        $outseq.=$sc_seq;
+    }
+
+    if($type eq 'U' || $type eq 'N') { ## Filler Ns
+        my $filler_length = $end-$start+1;
+        my $filler = 'N'x$filler_length;
+        $outseq.=$filler;
+    }
+
+    $cur_outseqname = $seqname;
+
+}
+
+if(length($outseq)) {
+    print "Writing pseudo-molecule $cur_outseqname ...\n";
+    print "Total length: ".length($outseq)."\n";
+
+    print OUT ">".$cur_outseqname."\n";
+    print OUT pretty_print($outseq,60);
+    $outseq = '';
+}
+
+
+sub pretty_print {
+    my ($seq,$block) = @_;
+    my $num= int(length($seq) / $block);
+    my $results ='';
+    for(my $i=0; $i<=$num; $i++) {
+        my $str = substr($seq,$i*$block,$block);
+        $results.=$str."\n" if ( length $str );
+    }
+    return $results;
+}
