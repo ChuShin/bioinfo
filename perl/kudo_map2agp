@@ -66,7 +66,6 @@ EOF
 my $sum=1;
 my $order_in_lg=1;
 my $curr_lg='';
-my $last_rank='';
 my $lc=0;
 
 while(<MAP>) {
@@ -80,8 +79,6 @@ while(<MAP>) {
         $lc=0;
     }
     if ($lc>0) {
-
-
         if ($evidence) {
             print OUT join("\t",$curr_lg,$sum,$sum+$gap_size-1,$order_in_lg++,'U',
                 $gap_size,'scaffold','yes',$evidence)."\n";
@@ -98,6 +95,5 @@ while(<MAP>) {
         $scaff,'1',$scaffs{$scaff},$strand)."\n";
     $sum+=$scaffs{$scaff};
     $lc+=1;
-    $last_rank=$rank;
 
 }
