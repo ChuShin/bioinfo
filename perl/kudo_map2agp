@@ -1,0 +1,103 @@
+#!/usr/bin/perl -w
+
+
+#  Copyright 2012 ChuShin Koh<ChuShin.Koh@gmail.ca>
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+
+
+use strict;
+use Getopt::Long;
+
+my $map_file;
+my $scaff_file;
+my $output;
+
+GetOptions("map_file=s" => \$map_file,
+    "scaff_file=s" => \$scaff_file,
+    "output=s" => \$output);
+
+unless (defined $map_file && defined $output) {
+print<<EOF;
+Usage:
+    kudo_radmap2agp
+        --map_file   [-m]   RADMap file
+        --scaff_index_file [-s]   scaffold FASTA index file
+        --output     [-o]   output AGP file
+
+EOF
+exit 1;
+}
+
+open(MAP,"<".$map_file) || die "Cannot read file\n";
+open(SEQ,"<".$scaff_file) || die "Cannot open index file\n";
+open(OUT,">".$output)  || die "Cannot write file\n";
+
+my %scaffs;
+my %data;
+my $gap_size = 100;
+
+while(<SEQ>) {
+    chomp;
+    my ($seq, $length, $offset, $linebases, $linewidth) = (split("\t",$_));
+    $scaffs{$seq} = $length;
+}
+
+
+print OUT<<EOF;
+##agp-version    2.0
+# ORGANISM:
+# TAX_ID:
+# ASSEMBLY NAME:
+# ASSEMBLY DATE:
+# GENOME CENTER:
+# DESCRIPTION:
+# COMMENTS:
+EOF
+
+my $sum=1;
+my $order_in_lg=1;
+my $curr_lg='';
+my $last_rank='';
+my $lc=0;
+
+while(<MAP>) {
+    chomp;
+    my ($lg,$scaff,$strand,$evidence) = (split("\t",$_));
+
+    if ($curr_lg ne $lg) {
+        $curr_lg = $lg;
+        $order_in_lg=1;
+        $sum=1;
+        $lc=0;
+    }
+    if ($lc>0) {
+
+
+        if ($evidence) {
+            print OUT join("\t",$curr_lg,$sum,$sum+$gap_size-1,$order_in_lg++,'U',
+                $gap_size,'scaffold','yes',$evidence)."\n";
+            $sum+=$gap_size;
+        }
+        else {
+            print OUT join("\t",$curr_lg,$sum,$sum+$gap_size-1,$order_in_lg++,'U',
+                $gap_size,'contig','no','na')."\n";
+            $sum+=$gap_size;
+        }
+    }
+
+    print OUT join("\t",$curr_lg,$sum,$sum+$scaffs{$scaff}-1,$order_in_lg++,'W',
+        $scaff,'1',$scaffs{$scaff},$strand)."\n";
+    $sum+=$scaffs{$scaff};
+    $lc+=1;
+    $last_rank=$rank;
+
+}
