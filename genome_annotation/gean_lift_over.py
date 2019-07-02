@@ -112,6 +112,9 @@ def lookup(start, end, strand, component):
         tmp_pos = new_start
         new_start = component['object_end'] - new_end
         new_end = component['object_end'] - tmp_pos
+    else:
+        print >> sys.stderr, 'Error: unknown strand "%s" value, ' \
+                             'please use (+,-,?)' %(component['strand'])
     return new_start, new_end, new_strand
 
 
