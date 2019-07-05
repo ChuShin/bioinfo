@@ -68,7 +68,8 @@ def gff_lift_over(filename, chrs):
                         if position >= int(start):
                             component = chrs[chr][position]
                             new_start, new_end, new_strand = \
-                                lookup(int(start), int(end), strand, component)
+                                lookup(feature_name, int(start), int(end),
+                                       strand, component)
                             print '%s\t%s\t%s\t%d\t%d\t%s\t%s\t%s\t%s' %(
                                 component['component_id'], source,
                                 feature_type, new_start, new_end, score,
@@ -82,10 +83,10 @@ def gff_lift_over(filename, chrs):
                 sys.exit(1)
 
 
-def lookup(start, end, strand, component):
+def lookup(feature_name, start, end, strand, component):
     if component['object_end'] < end:
-        print >> sys.stderr, 'Feature [%d, %d] crossed an object boundary %s' \
-                             %(start, end, component)
+        print >> sys.stderr, 'Feature [%s, %d, %d] crossed an object boundary' \
+                             ' %s' %(feature_name, start, end, component)
     new_start = start - component['object_beg']
     new_end = end - component['object_beg']
     new_strand = assign_strand(strand, component['strand'])
