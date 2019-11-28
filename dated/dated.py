@@ -28,7 +28,7 @@ def read_pairs(filename):
 
 def calculate_ds(pairs, pep_seqdb, cds_seqdb):
     ds_func = partial(get_ds, pep_seqdb, cds_seqdb)
-    with Pool(processes=4) as pool:
+    with Pool(processes=8) as pool:
         pool.map(ds_func, pairs)
 
 
