@@ -47,8 +47,7 @@ def get_ds(pep_seqdb, cds_seqdb, pairs):
             run_pal2nal(seqA, seqB, cds_seqdb, cds_seq_path,
                         aln_path, pal_path)
             ds = run_codeml(tmp_folder, pal_path)
-            print(ds)
-            #return ds
+            print(",".join(seqA, seqB, ds))
         finally:
             try:
                 os.chdir(cwd)
