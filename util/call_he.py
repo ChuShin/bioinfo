@@ -30,32 +30,66 @@ def load_covs(filename):
                 if dat[0] != "sample":
                     log_error(f"invalid file format: {line}")
             elif len(dat) == 7:
+
                 covs[dat[0]][dat[1]].append([float(dat[4]), float(dat[6]), line])
     return covs
 
 def normalize(covs):
     for sample in covs.keys():
-        log_message(f"normalizing sample: {sample}")
-        gene_A_covs = []
-        gene_B_covs = []
-        for chr_group in covs[sample].keys():
-            for gene in covs[sample][chr_group]:
-                gene_A_covs.append(gene[0])
-                gene_B_covs.append(gene[1])
-        observed_covs = [gene_A_covs, gene_B_covs]
-        data = np.array(observed_covs)
-        mean = np.mean(data)
-        stdev = np.std(data)
-        log_message(f" {sample} has mean= {mean:.2f}, stdev= {stdev:.2f}")
+        normalize_sample(sample, covs[sample])
 
-        z_scores = stats.zscore(data,axis=1)
 
-        #one-sided filtering of z-score to remove extreme high cov.
-        #filtered_entries = (z_scores < 3).all(axis=1)
-        #disable for now.
-        #new_df = df[filtered_entries]
-        #print(f"{data}")
-        #print(f"{z_scores}")
+def normalize_sample(sample, sample_cov):
+    gene_A_covs = []
+    gene_B_covs = []
+    log_message(f"normalizing sample: {sample}")
+
+    for chr_group in sample_cov.keys():
+        for gene in sample_cov[chr_group]:
+            gene_A_covs.append(gene[0])
+            gene_B_covs.append(gene[1])
+    observed_covs = [gene_A_covs, gene_B_covs]
+    data = np.array(observed_covs)
+    mean = np.mean(data)
+    stdev = np.std(data)
+    log_message(f"sample= {sample}, mean= {mean:.2f}, stdev= {stdev:.2f}")
+    z_scores = stats.zscore(data,axis=1)
+    call_he_events(z_scores, sample_cov)
+
+    #one-sided filtering of z-score to remove extreme high cov.
+    #filtered_entries = (z_scores < 3).all(axis=1)
+    #disable for now.
+    #new_df = df[filtered_entries]
+    #print(f"{data}")
+    #print(f"{z_scores}")
+
+
+def call_he_events(z_scores, sample_cov):
+
+
+
+def call_he_type(zscore_A, zscore_B):
+    cutoff = 1.5
+    if zscore_A < -1*cutoff and zscore_B < -1*cutoff:
+        return "del/del"
+    if zscore_A < -1*cutoff and abs(zscore_B) < cutoff:
+        return "del/norm"
+    if zscore_A < -1*cutoff and zscore_B > cutoff:
+        return "del/dup"
+    if abs(zscore_A) < cutoff and zscore_B < -1*cutoff:
+        return "norm/del"
+    if abs(zscore_A) < cutoff and abs(zscore_B) < cutoff:
+        return "norm/norm"
+    if abs(zscore_A) < cutoff and zscore_B > cutoff:
+        return "norm/dup"
+    if zscore_A > cutoff and zscore_B < -1*cutoff:
+        return "dup/del"
+    if zscore_A > cutoff and abs(zscore_B) < cutoff:
+        return "dup/norm"
+    if zscore_A > cutoff and zscore_B > cutoff:
+        return "dup/dup"
+    return "undefined"
+
 
 def log_error(message):
     """
