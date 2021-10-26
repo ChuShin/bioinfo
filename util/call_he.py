@@ -7,6 +7,7 @@ import numpy as np
 import scipy.stats as stats
 from collections import defaultdict
 from itertools import chain
+from itertools import islice
 
 """call_he.py: Given a coverage file, make HE calls."""
 
@@ -61,11 +62,42 @@ def normalize_sample(sample, sample_cov):
     #disable for now.
     #new_df = df[filtered_entries]
     #print(f"{data}")
-    #print(f"{z_scores}")
+    print(f"{z_scores}")
 
 
 def call_he_events(z_scores, sample_cov):
+    gene_count = len(z_scores[0])
+    he_array = []
+    for i in range(gene_count):
+        zscore_A = z_scores[0][i]
+        zscore_B = z_scores[1][i]
+        he_type = call_he_type(zscore_A, zscore_B)
+        he_array.append(he_type)
+    find_seeds(he_array)
 
+
+def find_seeds(he_array):
+    seed_size = 3
+    gene_count = len(he_array) - seed_size
+    he_events = [''] * len(he_array)
+    for i, he_type in enumerate(he_array):
+        #print(f"{i} {he_type}")
+        if i <= gene_count:
+            if is_hit(he_array, i, seed_size):
+                print(f"{i} is hit")
+                for j in range(i,i+seed_size):
+                    he_events[j] = he_type
+    print(f"{he_events}")
+
+
+def is_hit(he_array, i, seed_size):
+    if he_array[i] == "norm/norm":
+        return False
+    for j in range(i, i+seed_size):
+        #print(f"j is {j}")
+        if he_array[i] != he_array[j]:
+            return False
+    return True
 
 
 def call_he_type(zscore_A, zscore_B):
