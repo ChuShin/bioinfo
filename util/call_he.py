@@ -1,10 +1,12 @@
-#!/usr/bin/env python3
+#!/Users/chk512/p3envs/dev/bin/python3
 
 import argparse
 import sys
 import datetime
 import numpy as np
 import scipy.stats as stats
+from collections import OrderedDict
+
 from collections import defaultdict
 from itertools import chain
 from itertools import islice
@@ -19,7 +21,8 @@ def load_covs(filename):
     :param filename:
     """
 
-    covs = defaultdict(lambda: defaultdict(list))
+    #covs = defaultdict(lambda: defaultdict(list))
+    covs = OrderedDict()
     sample_metadata = {}
 
     linecount = 0
@@ -31,7 +34,11 @@ def load_covs(filename):
                 if dat[0] != "sample":
                     log_error(f"invalid file format: {line}")
             elif len(dat) == 7:
-                covs[dat[0]][dat[1]].append([float(dat[4]), float(dat[6]), line.strip()])
+                if dat[0] in covs.keys():
+                    covs[dat[0]].append([float(dat[4]), float(dat[6]), line.strip()])
+                else:
+                    covs[dat[0]] = [[float(dat[4]), float(dat[6]), line.strip()]]
+    #print(f"{covs}")
     return covs
 
 def normalize(covs):
@@ -44,24 +51,23 @@ def normalize_sample(sample, sample_cov):
     gene_B_covs = []
     log_message(f"normalizing sample: {sample}")
 
-    for chr_group in sample_cov.keys():
-        for gene in sample_cov[chr_group]:
-            gene_A_covs.append(gene[0])
-            gene_B_covs.append(gene[1])
+    for gene in sample_cov:
+        gene_A_covs.append(gene[0])
+        gene_B_covs.append(gene[1])
     observed_covs = [gene_A_covs, gene_B_covs]
     data = np.array(observed_covs)
     mean = np.mean(data)
     stdev = np.std(data)
     log_message(f"sample= {sample}, mean= {mean:.2f}, stdev= {stdev:.2f}")
-    z_scores = stats.zscore(data,axis=1)
+    z_scores = (data - mean) / stdev
     call_he_events(z_scores, sample_cov)
-
     #one-sided filtering of z-score to remove extreme high cov.
     #filtered_entries = (z_scores < 3).all(axis=1)
     #disable for now.
     #new_df = df[filtered_entries]
     #print(f"{data}")
     #print(f"{z_scores}")
+
 
 
 def call_he_events(z_scores, sample_cov):
@@ -78,9 +84,8 @@ def call_he_events(z_scores, sample_cov):
 
 
 def print_he_output(he_events, z_scores, sample_cov):
-    for chr_group in sample_cov.keys():
-        for i, gene in enumerate(sample_cov[chr_group]):
-            print(f"{gene[2]},{z_scores[0][i]},{z_scores[1][i]},{he_events[i]}")
+    for i, gene in enumerate(sample_cov):
+        print(f"{gene[2]},{z_scores[0][i]},{z_scores[1][i]},{he_events[i]}")
 
 
 
@@ -115,7 +120,7 @@ def is_hit(he_array, i, seed_size):
 
 
 def call_he_type(zscore_A, zscore_B):
-    cutoff = 1.5
+    cutoff = 1.0
     if zscore_A < -1*cutoff and zscore_B < -1*cutoff:
         return "del/del"
     if zscore_A < -1*cutoff and abs(zscore_B) < cutoff:
