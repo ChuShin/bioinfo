@@ -121,19 +121,19 @@ def call_he_type(zscore_A, zscore_B):
     cutoff = 1.0
     if zscore_A < -1*cutoff and zscore_B < -1*cutoff:
         return "del/del"
-    if zscore_A < -1*cutoff and abs(zscore_B) < cutoff:
+    if zscore_A < -1*cutoff and abs(zscore_B) <= cutoff:
         return "del/norm"
     if zscore_A < -1*cutoff and zscore_B > cutoff:
         return "del/dup"
-    if abs(zscore_A) < cutoff and zscore_B < -1*cutoff:
+    if abs(zscore_A) <= cutoff and zscore_B < -1*cutoff:
         return "norm/del"
-    if abs(zscore_A) < cutoff and abs(zscore_B) < cutoff:
+    if abs(zscore_A) <= cutoff and abs(zscore_B) <= cutoff:
         return "norm/norm"
-    if abs(zscore_A) < cutoff and zscore_B > cutoff:
+    if abs(zscore_A) <= cutoff and zscore_B > cutoff:
         return "norm/dup"
     if zscore_A > cutoff and zscore_B < -1*cutoff:
         return "dup/del"
-    if zscore_A > cutoff and abs(zscore_B) < cutoff:
+    if zscore_A > cutoff and abs(zscore_B) <= cutoff:
         return "dup/norm"
     if zscore_A > cutoff and zscore_B > cutoff:
         return "dup/dup"
