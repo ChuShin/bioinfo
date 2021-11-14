@@ -88,8 +88,6 @@ def print_he_output(he_events, z_scores, sample_cov):
         print(f"{gene[2]},{z_scores[0][i]},{z_scores[1][i]},{he_events[i]}")
 
 
-
-
 def find_seeds(he_array):
     seed_size = 3
     gene_count = len(he_array) - seed_size
