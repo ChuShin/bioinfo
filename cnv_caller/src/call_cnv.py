@@ -21,7 +21,6 @@ def load_covs(filename):
     :param filename:
     """
 
-    #covs = defaultdict(lambda: defaultdict(list))
     covs = OrderedDict()
     sample_metadata = {}
 
@@ -35,10 +34,22 @@ def load_covs(filename):
                     log_error(f"invalid file format: {line}")
             elif len(dat) == 7:
                 if dat[0] in covs.keys():
-                    covs[dat[0]].append([float(dat[4]), float(dat[6]), line.strip()])
+                    covs[dat[0]].append({
+                        'chr': dat[1],
+                        'position': int(dat[2]),
+                        'scoreA': float(dat[4]),
+                        'scoreB': float(dat[6]),
+                        'info': line.strip()
+                    })
                 else:
-                    covs[dat[0]] = [[float(dat[4]), float(dat[6]), line.strip()]]
-    #print(f"{covs}")
+                    covs[dat[0]] = [{
+                        'chr': dat[1],
+                        'position': int(dat[2]),
+                        'scoreA': float(dat[4]),
+                        'scoreB': float(dat[6]),
+                        'info': line.strip()
+                    }]
+    print(f"{covs}")
     return covs
 
 def normalize(covs):
@@ -52,8 +63,8 @@ def normalize_sample(sample, sample_cov):
     log_message(f"normalizing sample: {sample}")
 
     for gene in sample_cov:
-        gene_A_covs.append(gene[0])
-        gene_B_covs.append(gene[1])
+        gene_A_covs.append(gene['scoreA'])
+        gene_B_covs.append(gene['scoreB'])
     observed_covs = [gene_A_covs, gene_B_covs]
     data = np.array(observed_covs)
     mean = np.mean(data)
@@ -69,7 +80,6 @@ def normalize_sample(sample, sample_cov):
     #print(f"{z_scores}")
 
 
-
 def call_he_events(z_scores, sample_cov):
     gene_count = len(z_scores[0])
     he_array = []
@@ -79,14 +89,31 @@ def call_he_events(z_scores, sample_cov):
         he_type = call_he_type(zscore_A, zscore_B)
         he_array.append(he_type)
     seeds = find_seeds(he_array)
-    he_events = extend_seeds(seeds)
+    he_events = extend_seeds(seeds, sample_cov)
     print_he_output(he_events, z_scores, sample_cov)
 
 
 def print_he_output(he_events, z_scores, sample_cov):
+    summary = []
+    cur_event = []
+    cur_event_type = 'undef'
     for i, gene in enumerate(sample_cov):
-        print(f"{gene[2]},{z_scores[0][i]},{z_scores[1][i]},{he_events[i]}")
+        if len(he_events[i]):
+            if cur_event_type == he_events[i]:
+                cur_event[2] = gene['position']
+                cur_event[3] += 1
+            else:
+                cur_event_type = he_events[i]
+                cur_event = [gene['chr'], gene['position'], gene['position'], 1]
 
+        else:
+            if len(cur_event):
+                summary.append(cur_event)
+            cur_event = []
+            cur_event_type = 'undef'
+
+        #print(f"{gene['info']},{z_scores[0][i]},{z_scores[1][i]},{he_events[i]}")
+    print(f"{summary}")
 
 def find_seeds(he_array):
     seed_size = 3
@@ -102,9 +129,10 @@ def find_seeds(he_array):
 #    print(f"{he_events}")
     return he_seeds
 
-def extend_seeds(he_array):
+def extend_seeds(he_array, sample_cov):
     #skip
     return he_array
+
 
 
 def is_hit(he_array, i, seed_size):
@@ -149,6 +177,7 @@ def log_error(message):
     dt = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{dt}]: ERROR {message}")
     sys.exit(1)
+
 
 def log_message(message):
     """
