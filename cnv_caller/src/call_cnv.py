@@ -49,7 +49,7 @@ def load_covs(filename):
                         'scoreB': float(dat[6]),
                         'info': line.strip()
                     }]
-    print(f"{covs}")
+    #print(f"{covs}")
     return covs
 
 def normalize(covs):
@@ -71,7 +71,7 @@ def normalize_sample(sample, sample_cov):
     stdev = np.std(data)
     log_message(f"sample= {sample}, mean= {mean:.2f}, stdev= {stdev:.2f}")
     z_scores = (data - mean) / stdev
-    call_he_events(z_scores, sample_cov)
+    call_he_events(sample, z_scores, sample_cov)
     #one-sided filtering of z-score to remove extreme high cov.
     #filtered_entries = (z_scores < 3).all(axis=1)
     #disable for now.
@@ -80,7 +80,7 @@ def normalize_sample(sample, sample_cov):
     #print(f"{z_scores}")
 
 
-def call_he_events(z_scores, sample_cov):
+def call_he_events(sample, z_scores, sample_cov):
     gene_count = len(z_scores[0])
     he_array = []
     for i in range(gene_count):
@@ -90,30 +90,43 @@ def call_he_events(z_scores, sample_cov):
         he_array.append(he_type)
     seeds = find_seeds(he_array)
     he_events = extend_seeds(seeds, sample_cov)
-    print_he_output(he_events, z_scores, sample_cov)
+    summarize_cnvs(sample, he_events, z_scores, sample_cov)
 
 
-def print_he_output(he_events, z_scores, sample_cov):
+def summarize_cnvs(sample, he_events, z_scores, sample_cov):
     summary = []
-    cur_event = []
+    cur_event = {}
     cur_event_type = 'undef'
     for i, gene in enumerate(sample_cov):
+        #generate event summary
         if len(he_events[i]):
             if cur_event_type == he_events[i]:
-                cur_event[2] = gene['position']
-                cur_event[3] += 1
+                # update end position, gene_counts
+                cur_event['end'] = gene['position']
+                cur_event['count'] += 1
             else:
                 cur_event_type = he_events[i]
-                cur_event = [gene['chr'], gene['position'], gene['position'], 1]
-
+                cur_event = {
+                    'sample': sample,
+                    'chr': gene['chr'],
+                    'event': cur_event_type,
+                    'start': gene['position'],
+                    'end': gene['position'],
+                    'count': 1
+                }
         else:
             if len(cur_event):
                 summary.append(cur_event)
             cur_event = []
             cur_event_type = 'undef'
+    print_cnv_summary(summary)
 
-        #print(f"{gene['info']},{z_scores[0][i]},{z_scores[1][i]},{he_events[i]}")
-    print(f"{summary}")
+
+def print_cnv_summary(summary):
+    for cnv in summary:
+        if cnv['end'] - cnv['start'] > 20000:
+            print(f"{cnv}")
+
 
 def find_seeds(he_array):
     seed_size = 3
@@ -129,10 +142,10 @@ def find_seeds(he_array):
 #    print(f"{he_events}")
     return he_seeds
 
+
 def extend_seeds(he_array, sample_cov):
     #skip
     return he_array
-
 
 
 def is_hit(he_array, i, seed_size):
@@ -146,6 +159,15 @@ def is_hit(he_array, i, seed_size):
 
 
 def call_he_type(zscore_A, zscore_B):
+    """Given a pair of z-scores return a CNV event type
+    args:
+        zscore_A (float): z-score observed in first sample
+        zscoreB (float): z-score observed in 2nd sample or the reference
+
+    returns:
+        string: return CNV event type
+    """
+
     cutoff = 1.0
     if zscore_A < -1*cutoff and zscore_B < -1*cutoff:
         return "del/del"
