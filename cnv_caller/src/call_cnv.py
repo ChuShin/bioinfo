@@ -1,18 +1,12 @@
-#!/Users/chk512/p3envs/dev/bin/python3
+#!/usr/bin/env python3
 
 import argparse
 import sys
 import datetime
 import numpy as np
-import scipy.stats as stats
-from collections import OrderedDict
 
-from collections import defaultdict
-from itertools import chain
-from itertools import islice
-
-"""call_he.py: Given a coverage file, make HE calls."""
-
+"""call_he.py: Given a coverage file from either chromosome pairs or from a sample versus reference
+comparison, detect bias in CNV calls."""
 
 
 def load_covs(filename):
@@ -21,10 +15,9 @@ def load_covs(filename):
     :param filename:
     """
 
-    covs = OrderedDict()
-    sample_metadata = {}
-
+    covs = {}
     linecount = 0
+
     with open(filename, 'r') as infile:
         for line in infile:
             dat = line.strip().split(',')
@@ -49,8 +42,8 @@ def load_covs(filename):
                         'scoreB': float(dat[6]),
                         'info': line.strip()
                     }]
-    #print(f"{covs}")
     return covs
+
 
 def normalize(covs):
     for sample in covs.keys():
@@ -161,8 +154,8 @@ def is_hit(he_array, i, seed_size):
 def call_he_type(zscore_A, zscore_B):
     """Given a pair of z-scores return a CNV event type
     args:
-        zscore_A (float): z-score observed in first sample
-        zscoreB (float): z-score observed in 2nd sample or the reference
+        zscore_A (float): z-score observed in the first sample
+        zscoreB (float): z-score observed in the reference
 
     returns:
         string: return CNV event type
