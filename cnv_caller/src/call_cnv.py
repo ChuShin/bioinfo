@@ -142,6 +142,16 @@ def extend_seeds(he_array, sample_cov):
 
 
 def is_hit(he_array, i, seed_size):
+    """Determine if an he_array contains a hit in (i,i+seed_size) index pos.
+    args:
+        he_array (list): array of he_event strings
+        i: start index
+        seed_size: range to scan
+
+    returns:
+        boolean: return if a hit is found
+    """
+
     if he_array[i] == "norm/norm":
         return False
     for j in range(i, i+seed_size):
