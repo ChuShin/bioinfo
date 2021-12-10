@@ -45,9 +45,75 @@ def load_covs(filename):
     return covs
 
 
+def is_hit(he_array, i, seed_size):
+    """Determine if an he_array contains a hit in (i,i+seed_size) index pos.
+    args:
+        he_array (list): array of he_event strings
+        i: start index
+        seed_size: range to scan
+
+    returns:
+        boolean: return if a hit is found
+    """
+
+    if he_array[i] == "norm/norm":
+        return False
+    for j in range(i, i+seed_size):
+        #print(f"j is {j}")
+        if he_array[i] != he_array[j]:
+            return False
+    return True
+
+
+def call_he_type(zscore_A, zscore_B):
+    """Given a pair of z-scores return a CNV event type
+    args:
+        zscore_A (float): z-score observed in the first sample
+        zscoreB (float): z-score observed in the reference
+
+    returns:
+        string: return CNV event type
+    """
+
+    cutoff = 1.0
+    if zscore_A < -1*cutoff and zscore_B < -1*cutoff:
+        return "del/del"
+    if zscore_A < -1*cutoff and abs(zscore_B) <= cutoff:
+        return "del/norm"
+    if zscore_A < -1*cutoff and zscore_B > cutoff:
+        return "del/dup"
+    if abs(zscore_A) <= cutoff and zscore_B < -1*cutoff:
+        return "norm/del"
+    if abs(zscore_A) <= cutoff and abs(zscore_B) <= cutoff:
+        return "norm/norm"
+    if abs(zscore_A) <= cutoff and zscore_B > cutoff:
+        return "norm/dup"
+    if zscore_A > cutoff and zscore_B < -1*cutoff:
+        return "dup/del"
+    if zscore_A > cutoff and abs(zscore_B) <= cutoff:
+        return "dup/norm"
+    if zscore_A > cutoff and zscore_B > cutoff:
+        return "dup/dup"
+    return "undefined"
+
+
 def normalize(covs):
+    """Given raw coverage input normalize data and detect CNV events.
+    args:
+        covs: raw coverage loaded from input file
+
+    """
+
     for sample in covs.keys():
-        normalize_sample(sample, covs[sample])
+        z_scores = normalize_sample(sample, covs[sample])
+        call_he_events(sample, z_scores, covs[sample])
+
+    #one-sided filtering of z-score to remove extreme high cov.
+    #filtered_entries = (z_scores < 3).all(axis=1)
+    #disable for now.
+    #new_df = df[filtered_entries]
+    #print(f"{data}")
+    #print(f"{z_scores}")
 
 
 def normalize_sample(sample, sample_cov):
@@ -64,13 +130,8 @@ def normalize_sample(sample, sample_cov):
     stdev = np.std(data)
     log_message(f"sample= {sample}, mean= {mean:.2f}, stdev= {stdev:.2f}")
     z_scores = (data - mean) / stdev
-    call_he_events(sample, z_scores, sample_cov)
-    #one-sided filtering of z-score to remove extreme high cov.
-    #filtered_entries = (z_scores < 3).all(axis=1)
-    #disable for now.
-    #new_df = df[filtered_entries]
-    #print(f"{data}")
-    #print(f"{z_scores}")
+
+    return z_scores
 
 
 def call_he_events(sample, z_scores, sample_cov):
@@ -139,58 +200,6 @@ def find_seeds(he_array):
 def extend_seeds(he_array, sample_cov):
     #skip
     return he_array
-
-
-def is_hit(he_array, i, seed_size):
-    """Determine if an he_array contains a hit in (i,i+seed_size) index pos.
-    args:
-        he_array (list): array of he_event strings
-        i: start index
-        seed_size: range to scan
-
-    returns:
-        boolean: return if a hit is found
-    """
-
-    if he_array[i] == "norm/norm":
-        return False
-    for j in range(i, i+seed_size):
-        #print(f"j is {j}")
-        if he_array[i] != he_array[j]:
-            return False
-    return True
-
-
-def call_he_type(zscore_A, zscore_B):
-    """Given a pair of z-scores return a CNV event type
-    args:
-        zscore_A (float): z-score observed in the first sample
-        zscoreB (float): z-score observed in the reference
-
-    returns:
-        string: return CNV event type
-    """
-
-    cutoff = 1.0
-    if zscore_A < -1*cutoff and zscore_B < -1*cutoff:
-        return "del/del"
-    if zscore_A < -1*cutoff and abs(zscore_B) <= cutoff:
-        return "del/norm"
-    if zscore_A < -1*cutoff and zscore_B > cutoff:
-        return "del/dup"
-    if abs(zscore_A) <= cutoff and zscore_B < -1*cutoff:
-        return "norm/del"
-    if abs(zscore_A) <= cutoff and abs(zscore_B) <= cutoff:
-        return "norm/norm"
-    if abs(zscore_A) <= cutoff and zscore_B > cutoff:
-        return "norm/dup"
-    if zscore_A > cutoff and zscore_B < -1*cutoff:
-        return "dup/del"
-    if zscore_A > cutoff and abs(zscore_B) <= cutoff:
-        return "dup/norm"
-    if zscore_A > cutoff and zscore_B > cutoff:
-        return "dup/dup"
-    return "undefined"
 
 
 def log_error(message):
