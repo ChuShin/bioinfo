@@ -10,9 +10,12 @@ comparison, detect bias in CNV calls."""
 
 
 def load_covs(filename):
-    """
-    load coverage file
-    :param filename:
+    """Load coverage file
+    args:
+        filename: filename to load
+
+    returns:
+        dict: dictionary of samples, meta-data and raw coverage values
     """
 
     covs = {}
@@ -117,6 +120,14 @@ def normalize(covs):
 
 
 def normalize_sample(sample, sample_cov):
+    """Given raw coverage of a sample return normalized values
+    args:
+        sample_cov: raw coverage of a sample
+
+    returns:
+        array: return an array of normalized values
+    """
+
     gene_A_covs = []
     gene_B_covs = []
     log_message(f"normalizing sample: {sample}")
